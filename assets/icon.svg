@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Dark background -->
+  <rect width="1024" height="1024" fill="#0a0c10"/>
+  <!-- Outer gold hexagon -->
+  <polygon points="512,120 860,312 860,712 512,904 164,712 164,312" fill="none" stroke="#f5a623" stroke-width="44"/>
+  <!-- Inner hexagon (dim) -->
+  <polygon points="512,248 752,380 752,644 512,776 272,644 272,380" fill="none" stroke="#f5a623" stroke-width="16" opacity="0.35"/>
+  <!-- Gold play/lightning bolt - centered -->
+  <polygon points="420,308 420,716 748,512" fill="#f5a623"/>
+  <!-- Small AI dot -->
+  <circle cx="512" cy="512" r="22" fill="#0a0c10"/>
+</svg>

@@ -1648,7 +1648,9 @@ let selectedFocuses = [];
 let isPro  = localStorage.getItem('dc_is_pro')  === 'true';
 let proKey = localStorage.getItem('dc_pro_key') || '';
 const FREE_LIMITS  = { analyses: 5, chat: 10, players: 2 };
-const BACKEND_URL  = 'https://api.diamondcoach.app'; // ← update after deploying backend
+// BACKEND_URL: override at runtime via localStorage key 'dc_backend_url'
+// e.g. localStorage.setItem('dc_backend_url','https://coachai-backend.onrender.com')
+const BACKEND_URL  = localStorage.getItem('dc_backend_url') || 'https://api.diamondcoach.app';
 
 // Persistent device ID (survives reinstall if same device storage)
 function getDeviceId() {

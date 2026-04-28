@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2732 2732" width="2732" height="2732">
+  <!-- Full dark background -->
+  <rect width="2732" height="2732" fill="#0a0c10"/>
+  <!-- Centered logo group -->
+  <!-- Hexagon -->
+  <polygon points="1366,1000 1780,1240 1780,1492 1366,1732 952,1492 952,1240" fill="none" stroke="#f5a623" stroke-width="52"/>
+  <polygon points="1366,1100 1680,1272 1680,1460 1366,1632 1052,1460 1052,1272" fill="none" stroke="#f5a623" stroke-width="18" opacity="0.3"/>
+  <!-- Play arrow -->
+  <polygon points="1280,1140 1280,1592 1620,1366" fill="#f5a623"/>
+  <!-- App name below -->
+  <text x="1366" y="1860" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="800" font-size="120" fill="#f5a623" letter-spacing="8">CoachAI</text>
+  <text x="1366" y="1960" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="400" font-size="60" fill="#8b93aa" letter-spacing="12">AI SPORTS COACHING</text>
+</svg>
