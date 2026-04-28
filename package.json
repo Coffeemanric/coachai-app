@@ -1,0 +1,23 @@
+{
+  "name": "diamond-coach-app",
+  "version": "1.0.0",
+  "description": "DiamondCoach AI - Mobile Baseball Coaching App",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo \"No build step required\"",
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/ios": "^8.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

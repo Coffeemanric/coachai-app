@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CoachAI Pro — Subscribe</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0c10;color:#eceef5;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+  .card{background:#111318;border:1px solid #242a38;border-radius:20px;padding:36px 32px;max-width:420px;width:100%}
+  h1{font-size:28px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px}
+  h1 span{color:#f5a623}
+  .sub{font-size:14px;color:#8b93aa;margin-bottom:28px}
+  .price{font-size:42px;font-weight:800;color:#f5a623;line-height:1}
+  .price small{font-size:16px;font-weight:500;color:#8b93aa}
+  .features{list-style:none;margin:20px 0 28px}
+  .features li{padding:8px 0;font-size:14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e2330}
+  .features li:last-child{border-bottom:none}
+  .features li::before{content:'✅';font-size:16px}
+  input{width:100%;padding:13px 16px;background:#181c24;border:1px solid #2e3650;border-radius:10px;color:#eceef5;font-size:15px;margin-bottom:12px;outline:none}
+  input:focus{border-color:#f5a623}
+  input::placeholder{color:#4a5168}
+  button{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#f5a623,#d4700a);color:#0a0c10;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:0.02em;transition:opacity .2s}
+  button:hover{opacity:.9}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .note{font-size:11px;color:#4a5168;text-align:center;margin-top:14px;line-height:1.5}
+  .error{color:#e53935;font-size:13px;margin-bottom:10px;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>⭐ CoachAI <span>Pro</span></h1>
+  <p class="sub">Unlimited AI coaching across all 4 sports. Cancel any time.</p>
+
+  <div class="price">$9.99 <small>/ month</small></div>
+
+  <ul class="features">
+    <li>All 4 sports — Baseball, Hockey, Basketball, Football</li>
+    <li>Unlimited AI analyses</li>
+    <li>Unlimited coach chat</li>
+    <li>Unlimited player profiles</li>
+    <li>DiamondCoach AI included (no API key needed)</li>
+    <li>Priority support</li>
+  </ul>
+
+  <p id="error" class="error"></p>
+  <input type="email" id="email" placeholder="Your email address" autocomplete="email">
+  <button id="btn" onclick="checkout()">Subscribe Now →</button>
+  <p class="note">Secure payment via Stripe · Cancel anytime in your account<br>
+  Your license key will be emailed immediately after payment.</p>
+</div>
+
+<script>
+async function checkout() {
+  const email = document.getElementById('email').value.trim();
+  const err   = document.getElementById('error');
+  const btn   = document.getElementById('btn');
+  err.style.display = 'none';
+
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    err.textContent = 'Please enter a valid email address.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to payment…';
+
+  try {
+    const res  = await fetch('/create-checkout', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch (e) {
+    err.textContent = 'Payment error: ' + e.message + '. Please try again.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Subscribe Now →';
+  }
+}
+// Allow Enter key
+document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') checkout(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,3488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0c10">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' capacitor: ionic:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com https://*.diamondcoach.app; img-src 'self' data: blob: https:;">
+<title>CoachAI — Multi-Sport</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #111318;
+  --surface2: #181c24;
+  --surface3: #1e2330;
+  --border: #242a38;
+  --border2: #2e3650;
+  --gold: #f5a623;
+  --gold2: #d4700a;
+  --gold-dim: rgba(245,166,35,0.15);
+  --red: #e53935;
+  --green: #00c853;
+  --blue: #2979ff;
+  --purple: #aa00ff;
+  --text: #eceef5;
+  --text2: #8b93aa;
+  --muted: #4a5168;
+  --safe: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SHELL ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.app-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  z-index: 20;
+}
+
+.logo-wrap { display: flex; align-items: baseline; gap: 6px; }
+.logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.key-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.key-btn:active { border-color: var(--gold); color: var(--gold); }
+@media (hover: hover) { .key-btn:hover { border-color: var(--gold); color: var(--gold); } }
+.key-btn.connected { border-color: rgba(0,200,83,0.4); color: var(--green); }
+
+/* ── MODULE STRIP ── */
+.module-strip {
+  flex-shrink: 0;
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  scrollbar-width: none;
+}
+.module-strip::-webkit-scrollbar { display: none; }
+
+.mod-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.mod-chip.active {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.mod-chip .badge {
+  background: var(--gold);
+  color: #0a0c10;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  letter-spacing: 0.06em;
+}
+
+/* ── SPORT STRIP ── */
+.sport-strip {
+  flex-shrink: 0;
+  display: flex;
+  gap: 6px;
+  padding: 7px 14px 5px;
+  overflow-x: auto;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+.sport-strip::-webkit-scrollbar { display: none; }
+.sport-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.sport-chip[data-sport="baseball"].active { background: rgba(245,166,35,0.15); border-color: #f5a623; color: #f5a623; }
+.sport-chip[data-sport="hockey"].active   { background: rgba(41,121,255,0.15);  border-color: #2979ff; color: #2979ff; }
+.sport-chip[data-sport="basketball"].active { background: rgba(255,109,0,0.15); border-color: #ff6d00; color: #ff6d00; }
+.sport-chip[data-sport="football"].active { background: rgba(0,200,83,0.15);   border-color: #00c853; color: #00c853; }
+
+/* ── SCROLLABLE CONTENT ── */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-bottom: calc(80px + var(--safe));
+}
+.page-content::-webkit-scrollbar { display: none; }
+
+/* ── SECTION ── */
+.page { display: none; }
+.page.active { display: block; }
+
+.page-header {
+  padding: 20px 18px 14px;
+  background: linear-gradient(180deg, rgba(245,166,35,0.06) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  color: var(--text);
+}
+.page-title span { color: var(--gold); }
+.page-desc { font-size: 13px; color: var(--text2); margin-top: 5px; line-height: 1.4; }
+
+.section { padding: 16px 16px 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── UPLOAD ── */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 12px;
+  padding: 32px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.upload-zone:active { border-color: var(--gold); background: var(--gold-dim); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+.upload-text { font-size: 15px; font-weight: 600; color: var(--text); }
+.upload-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+.video-wrap { border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: none; }
+.video-wrap video { width: 100%; height: 100%; object-fit: contain; }
+
+/* ── VIDEO CONTROLS ── */
+.video-controls {
+  display: none;
+  gap: 8px;
+  margin-top: 10px;
+}
+.vid-ctrl-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.vid-ctrl-btn:active { opacity: 0.75; }
+.vid-ctrl-btn.danger { border-color: rgba(229,57,53,0.35); color: var(--red); }
+.vid-ctrl-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.vid-ctrl-btn.replace { position: relative; overflow: hidden; }
+
+/* ── USAGE METER ── */
+.usage-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.usage-label { font-size: 12px; color: var(--text2); flex: 1; }
+.usage-label strong { color: var(--text); }
+.usage-pips { display: flex; gap: 3px; }
+.usage-pip {
+  width: 10px; height: 10px; border-radius: 2px;
+  background: var(--border2);
+  transition: background 0.2s;
+}
+.usage-pip.used { background: var(--gold); }
+.usage-upgrade-link {
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+/* ── UPGRADE / PRO HEADER BTN ── */
+.upgrade-btn {
+  background: linear-gradient(135deg, #f5a623, #d4700a) !important;
+  color: #0a0c10 !important;
+  border-color: transparent !important;
+  font-weight: 700 !important;
+}
+.pro-badge {
+  background: linear-gradient(135deg, #f5a623, #d4700a) !important;
+  color: #0a0c10 !important;
+  border-color: transparent !important;
+  font-weight: 700 !important;
+}
+
+/* ── LOCKED SPORT CHIP ── */
+.sport-chip.locked { opacity: 0.5; }
+.sport-chip.locked::after { content: ' 🔒'; font-size: 9px; }
+
+/* ── PRO MODAL ── */
+#proModal .modal-box { max-height: 90vh; overflow-y: auto; }
+
+.plan-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+.plan-card {
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.plan-card.pro-card {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, rgba(245,166,35,0.07) 0%, transparent 60%);
+}
+.plan-top-badge {
+  position: absolute;
+  top: -10px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: #0a0c10;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.plan-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+.plan-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+}
+.plan-price span { font-size: 13px; font-weight: 500; color: var(--text2); }
+.plan-divider { height: 1px; background: var(--border); margin: 6px 0; }
+.plan-feat {
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.3;
+}
+.plan-feat.good { color: var(--text); }
+.plan-feat.locked-feat { opacity: 0.45; }
+.plan-subscribe-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #0a0c10;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.plan-subscribe-btn:active { opacity: 0.8; }
+
+.pro-activate-wrap {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.pro-activate-row { display: flex; gap: 8px; margin-top: 8px; }
+.pro-activate-row .form-input { flex: 1; font-family: monospace; letter-spacing: 0.05em; }
+.pro-activate-btn {
+  padding: 0 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--gold);
+  color: #0a0c10;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pro-key-result {
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  display: none;
+}
+.pro-key-result.ok  { background: rgba(0,200,83,0.1);  color: var(--green); }
+.pro-key-result.err { background: rgba(229,57,53,0.1); color: var(--red); }
+
+.pro-manage-wrap {
+  background: rgba(0,200,83,0.06);
+  border: 1px solid rgba(0,200,83,0.25);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pro-manage-icon { font-size: 28px; }
+.pro-manage-info { flex: 1; }
+.pro-manage-title { font-weight: 700; font-size: 14px; color: var(--green); }
+.pro-manage-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.pro-cancel-link { font-size: 11px; color: var(--muted); text-decoration: underline; cursor: pointer; }
+
+/* ── GRADE DELTA ARROWS ── */
+.g-delta {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.04em;
+  padding: 1px 4px; border-radius: 4px; margin-top: 2px; display: block;
+}
+.g-delta.up   { background: rgba(0,200,83,0.18);  color: var(--green); }
+.g-delta.down { background: rgba(229,57,53,0.18); color: var(--red); }
+.g-delta.same { background: rgba(139,147,170,0.15); color: var(--muted); }
+
+/* ── ANALYSIS HISTORY PANEL ── */
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.history-row:last-child { border-bottom: none; }
+.history-date {
+  font-size: 11px; color: var(--text2); white-space: nowrap; min-width: 60px;
+}
+.history-meta {
+  font-size: 11px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-grades { display: flex; gap: 3px; flex-wrap: wrap; }
+.h-grade {
+  font-size: 10px; font-weight: 800; font-family: 'Bebas Neue', sans-serif;
+  width: 18px; height: 18px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: 0.02em;
+}
+.h-grade.gA { background: rgba(0,200,83,0.2);  color: var(--green); }
+.h-grade.gB { background: rgba(245,166,35,0.2); color: var(--gold); }
+.h-grade.gC { background: rgba(255,152,0,0.2);  color: #ff9800; }
+.h-grade.gD { background: rgba(229,57,53,0.2);  color: var(--red); }
+
+/* ── PLAYER PROGRESS SECTION ── */
+.player-progress {
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.player-progress-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.player-analysis-row {
+  display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px;
+}
+.player-analysis-row:last-child { margin-bottom: 0; }
+.pa-label { font-size: 11px; color: var(--text2); }
+.pa-grades { display: flex; gap: 3px; flex-wrap: wrap; }
+.trend-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; margin-top: 4px;
+}
+.trend-pill.up   { background: rgba(0,200,83,0.15);  color: var(--green); }
+.trend-pill.down { background: rgba(229,57,53,0.15); color: var(--red); }
+.trend-pill.flat { background: rgba(139,147,170,0.12); color: var(--muted); }
+
+/* ── COMPARE HEADER ── */
+.compare-header {
+  font-size: 11px; color: var(--text2); padding: 2px 4px 8px;
+  width: 100%; display: flex; align-items: center; gap: 6px;
+}
+
+/* ── FOCUS PILLS ── */
+.focus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.focus-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-user-select: none;
+}
+.focus-pill:active { transform: scale(0.97); }
+.focus-pill.on { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+.focus-pill .fi { font-size: 16px; }
+
+/* ── ANALYZE BTN ── */
+.analyze-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #0a0c10;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.analyze-btn:active { transform: scale(0.98); }
+.analyze-btn:disabled { opacity: 0.45; }
+
+/* ── GRADE CHIPS ── */
+.grade-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0 8px;
+}
+.grade-strip::-webkit-scrollbar { display: none; }
+
+.g-chip {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 72px;
+}
+.g-chip:active { transform: scale(0.96); }
+.g-chip.selected { border-color: var(--gold); background: var(--gold-dim); }
+.g-chip .g-area { font-size: 10px; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
+.g-chip .g-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 0.04em; line-height: 1; }
+.g-chip .g-label { font-size: 9px; color: var(--muted); margin-top: 2px; }
+.gA { color: var(--green); } .gB { color: var(--gold); } .gC { color: #ff9800; } .gD { color: var(--red); }
+
+/* ── CORRECTION PLAN ── */
+.correction-plan { display: none; }
+.correction-plan.show { display: block; }
+
+.plan-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border-radius: 12px 12px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  cursor: pointer;
+}
+.plan-area-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+.plan-grade { font-family: 'Bebas Neue', sans-serif; font-size: 22px; }
+.plan-toggle { font-size: 16px; color: var(--muted); transition: transform 0.2s; }
+.plan-toggle.open { transform: rotate(180deg); }
+
+.plan-body {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease;
+}
+.plan-body.open { max-height: 2000px; }
+
+.plan-summary {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* ── EXERCISE CARDS ── */
+.exercise-card {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+}
+
+.ex-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ex-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,166,35,0.4);
+  color: var(--gold);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ex-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  flex: 1;
+}
+
+.ex-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.ex-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.ex-tag.reps { color: var(--blue); border-color: rgba(41,121,255,0.3); background: rgba(41,121,255,0.08); }
+.ex-tag.sets { color: var(--purple); border-color: rgba(170,0,255,0.3); background: rgba(170,0,255,0.08); }
+.ex-tag.duration { color: var(--green); border-color: rgba(0,200,83,0.3); background: rgba(0,200,83,0.08); }
+
+/* ── ANIMATION BOX ── */
+.anim-box {
+  border-radius: 10px;
+  background: #000;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+
+.anim-label {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── ANIMATIONS ── */
+
+/* STANCE SETUP */
+@keyframes stanceRock {
+  0%,100% { transform: rotate(-3deg) translateX(-2px); }
+  50% { transform: rotate(3deg) translateX(2px); }
+}
+@keyframes kneesBend {
+  0%,100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.88); }
+}
+@keyframes weightShift {
+  0%,100% { transform: translateX(0); }
+  50% { transform: translateX(-6px); }
+}
+@keyframes hipCoil {
+  0%,100% { transform: rotate(0deg); }
+  50% { transform: rotate(-15deg); }
+}
+@keyframes armSwing {
+  0% { transform: rotate(-40deg); }
+  50% { transform: rotate(60deg); }
+  100% { transform: rotate(-40deg); }
+}
+@keyframes legDrive {
+  0%,100% { transform: translateY(0) scaleX(1); }
+  50% { transform: translateY(-8px) scaleX(1.1); }
+}
+@keyframes followPulse {
+  0% { transform: rotate(-30deg); opacity: 0.3; }
+  50% { transform: rotate(120deg); opacity: 1; }
+  100% { transform: rotate(-30deg); opacity: 0.3; }
+}
+@keyframes gloveOpen {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.25) rotate(8deg); }
+}
+@keyframes catcherSquat {
+  0%,100% { transform: scaleY(1) translateY(0); }
+  50% { transform: scaleY(0.75) translateY(8px); }
+}
+@keyframes throwArm {
+  0% { transform: rotate(-60deg); }
+  40% { transform: rotate(-90deg); }
+  100% { transform: rotate(80deg); }
+}
+@keyframes sprintLeg {
+  0%,100% { transform: rotate(-20deg); }
+  50% { transform: rotate(40deg); }
+}
+@keyframes sprintArm {
+  0%,100% { transform: rotate(30deg); }
+  50% { transform: rotate(-30deg); }
+}
+@keyframes slideIn {
+  0% { transform: translateX(0) rotate(0deg); }
+  70% { transform: translateX(30px) rotate(-15deg); }
+  100% { transform: translateX(28px) rotate(-20deg); }
+}
+@keyframes fieldBackhand {
+  0% { transform: rotate(20deg) translateX(0); }
+  50% { transform: rotate(-30deg) translateX(12px); }
+  100% { transform: rotate(20deg) translateX(0); }
+}
+@keyframes ballTrack {
+  0% { transform: translateX(-40px) translateY(-20px); opacity:0; }
+  30% { opacity:1; }
+  100% { transform: translateX(30px) translateY(20px); opacity:0.6; }
+}
+@keyframes transferSnap {
+  0%,100% { transform: scale(1); }
+  45% { transform: scale(0.85) rotate(-10deg); }
+  55% { transform: scale(1.15) rotate(5deg); }
+}
+@keyframes popTimeDash {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50px); }
+}
+@keyframes frameZone {
+  0%,100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(-6px) translateY(2px); }
+  75% { transform: translateX(6px) translateY(-2px); }
+}
+@keyframes hipTurn {
+  0% { transform: rotate(-20deg); }
+  100% { transform: rotate(30deg); }
+}
+@keyframes teeContact {
+  0% { transform: rotate(-30deg) translateX(-10px); opacity:0.5; }
+  60% { transform: rotate(10deg) translateX(5px); opacity:1; }
+  100% { transform: rotate(30deg) translateX(15px); opacity:0.5; }
+}
+@keyframes loadCoil {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(-8px) rotate(-12deg); }
+}
+@keyframes leadStep {
+  0%,100% { transform: translateX(0) scaleX(1); }
+  50% { transform: translateX(6px) scaleX(1.05); }
+}
+@keyframes glowPulse {
+  0%,100% { opacity:0.4; transform:scale(1); }
+  50% { opacity:0.9; transform:scale(1.05); }
+}
+@keyframes ballRelease {
+  0% { transform: translateX(-20px) translateY(0) rotate(0deg); opacity:1; }
+  100% { transform: translateX(40px) translateY(-10px) rotate(360deg); opacity:0.3; }
+}
+
+/* Stick figure parts */
+.sf { position: absolute; }
+.sf-head { width:18px; height:18px; border-radius:50%; background:transparent; border:2px solid var(--gold); }
+.sf-body { width:2px; background:var(--gold); border-radius:2px; }
+.sf-arm { width:2px; background:var(--gold); border-radius:2px; transform-origin:top center; }
+.sf-leg { width:2px; background:var(--gold); border-radius:2px; transform-origin:top center; }
+.sf-bat { width:3px; background:#ccc; border-radius:2px; transform-origin:bottom center; }
+.sf-glove { width:16px; height:12px; border-radius:8px 8px 4px 4px; background:transparent; border:2px solid #8B4513; }
+.sf-ball { width:10px; height:10px; border-radius:50%; background:white; border:1px solid #ccc; }
+.sf-base { width:14px; height:10px; background:white; border-radius:2px; transform:rotate(45deg); }
+.sf-tee { width:3px; background:#555; border-radius:2px; }
+
+/* Grid line decoration */
+.anim-grid {
+  position:absolute; inset:0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.03) 19px, rgba(255,255,255,0.03) 20px),
+    repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.03) 19px, rgba(255,255,255,0.03) 20px);
+}
+
+/* ── STEPS LIST ── */
+.steps-list { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+.step-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  border-left: 3px solid var(--border2);
+}
+.step-item.key { border-left-color: var(--gold); }
+
+.step-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--gold);
+  width: 18px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.step-text { font-size: 13px; color: var(--text2); line-height: 1.55; }
+.step-text strong { color: var(--text); }
+
+/* ── EXPECTED RESULTS ── */
+.results-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(0,200,83,0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(0,200,83,0.2);
+}
+
+.results-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.results-text { font-size: 13px; color: rgba(0,200,83,0.85); line-height: 1.5; }
+
+/* ── OVERALL ANALYSIS TEXT ── */
+.analysis-text {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.65;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.analysis-text strong { color: var(--text); }
+.analysis-text p { margin-bottom: 8px; }
+.analysis-text p:last-child { margin-bottom: 0; }
+
+/* ── DRILL TRACKER ── */
+.drill-form { display: flex; flex-direction: column; gap: 12px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.form-input, .form-select, .form-textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+.form-textarea { resize: none; min-height: 80px; line-height: 1.5; }
+.form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5168' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+.submit-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #0a0c10;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.submit-btn:active { transform: scale(0.98); }
+
+/* ── STATS ROW ── */
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+.stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 0.04em; color: var(--gold); line-height: 1; }
+.stat-lbl { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ── DRILL LIST ── */
+.drill-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.drill-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.drill-info { flex: 1; min-width: 0; }
+.drill-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+.drill-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.drill-note { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drill-tag { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.dt-hit { background: rgba(245,166,35,0.15); color: var(--gold); }
+.dt-cat { background: rgba(41,121,255,0.15); color: var(--blue); }
+.dt-thr { background: rgba(0,200,83,0.15); color: var(--green); }
+.dt-run { background: rgba(170,0,255,0.15); color: var(--purple); }
+.dt-fld { background: rgba(229,57,53,0.15); color: var(--red); }
+.del-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+
+/* ── COACH CHAT ── */
+.chat-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.chat-messages::-webkit-scrollbar { display: none; }
+.msg { display: flex; gap: 8px; align-items: flex-end; }
+.msg.user { flex-direction: row-reverse; }
+.m-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.msg.user .m-avatar { background: var(--gold-dim); border-color: rgba(245,166,35,0.3); }
+.m-bubble { max-width: 78%; padding: 10px 13px; border-radius: 14px; font-size: 14px; line-height: 1.6; }
+.msg.assistant .m-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.msg.user .m-bubble { background: var(--gold-dim); border: 1px solid rgba(245,166,35,0.25); border-bottom-right-radius: 4px; }
+.m-bubble strong { color: var(--gold); }
+.typing-dots { display:flex; gap:4px; padding:4px; }
+.typing-dots span { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:tdot 1.1s infinite; }
+.typing-dots span:nth-child(2) { animation-delay:.18s; }
+.typing-dots span:nth-child(3) { animation-delay:.36s; }
+@keyframes tdot { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);background:var(--gold);} }
+
+/* ── TOAST ── */
+.dc-toast { position:fixed; bottom:calc(90px + var(--safe)); left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface2); border:1px solid var(--border2); color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; font-weight:500; padding:10px 18px; border-radius:24px; z-index:9999; opacity:0; transition:opacity 0.25s, transform 0.25s; pointer-events:none; white-space:nowrap; }
+.dc-toast-show { opacity:1; transform:translateX(-50%) translateY(0); }
+.dc-toast-error { border-color:var(--red); color:var(--red); }
+.dc-toast-success { border-color:var(--green); color:var(--green); }
+
+/* ── CONFIRM MODAL ── */
+#confirmModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9998; align-items:center; justify-content:center; padding:24px; }
+#confirmModal.show { display:flex; }
+.confirm-box { background:var(--surface2); border:1px solid var(--border2); border-radius:16px; padding:24px; max-width:320px; width:100%; text-align:center; }
+.confirm-box p { font-size:16px; color:var(--text); margin-bottom:20px; }
+.confirm-actions { display:flex; gap:10px; justify-content:center; }
+.confirm-actions button { flex:1; padding:10px; border-radius:10px; font-family:'Barlow',sans-serif; font-size:14px; font-weight:600; cursor:pointer; border:none; }
+#confirmYes { background:var(--red); color:#fff; }
+#confirmNo { background:var(--surface3); color:var(--text2); }
+
+.quick-row { display:flex; gap:6px; overflow-x:auto; padding:10px 14px 0; scrollbar-width:none; flex-shrink:0; }
+.quick-row::-webkit-scrollbar { display:none; }
+.qq { flex-shrink:0; padding:7px 12px; border-radius:16px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-family:'Barlow',sans-serif; font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
+.qq:active { border-color:var(--gold); color:var(--gold); }
+
+.chat-input-row { display:flex; gap:8px; padding:12px 14px; padding-bottom:calc(12px + var(--safe)); border-top:1px solid var(--border); background:var(--bg); flex-shrink:0; }
+.chat-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:22px; color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; padding:10px 16px; outline:none; resize:none; max-height:100px; line-height:1.4; transition:border-color 0.2s; }
+.chat-input:focus { border-color:var(--gold); }
+.send-btn { width:40px; height:40px; border-radius:50%; border:none; background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#0a0c10; font-size:16px; cursor:pointer; flex-shrink:0; align-self:flex-end; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.send-btn:active { transform:scale(0.92); }
+.send-btn:disabled { opacity:0.4; }
+
+/* ── FIELD DIAGRAM ── */
+.field-wrap { background: radial-gradient(ellipse at 50% 85%, #1d4a1d 0%, #0f260f 50%, #0a0c10 100%); border-radius: 14px; overflow: hidden; aspect-ratio: 1; position: relative; border: 1px solid var(--border); margin-bottom: 12px; }
+.field-svg { width:100%; height:100%; }
+.pos-dot { position:absolute; width:36px; height:36px; border-radius:50%; border:2px solid rgba(245,166,35,0.35); background:rgba(245,166,35,0.08); color:var(--gold); font-size:10px; font-weight:700; cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center; transform:translate(-50%,-50%); font-family:'Barlow Condensed',sans-serif; letter-spacing:0.04em; }
+.pos-dot.active { border-color:var(--gold); background:rgba(245,166,35,0.22); transform:translate(-50%,-50%) scale(1.15); }
+.pos-tip { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 15px; }
+.pos-tip-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; color:var(--gold); margin-bottom:8px; }
+.pos-tip-body { font-size:13px; color:var(--text2); line-height:1.6; }
+.pos-tip-body strong { color:var(--text); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(10,12,16,0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe);
+  z-index: 30;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.nav-btn.active { color: var(--gold); }
+.nav-btn .n-icon { font-size: 20px; }
+.nav-btn .n-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); display: none; }
+.nav-btn.active .nav-dot { display: block; }
+
+/* ── MODAL ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:100; display:flex; align-items:flex-end; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.modal-overlay.show { opacity:1; pointer-events:all; }
+.modal-sheet { background:var(--surface); border-radius:20px 20px 0 0; padding:24px 20px; padding-bottom:calc(24px + var(--safe)); width:100%; transform:translateY(40px); transition:transform 0.25s ease; border-top:1px solid var(--border2); }
+.modal-overlay.show .modal-sheet { transform:translateY(0); }
+.modal-handle { width:36px; height:4px; border-radius:2px; background:var(--border2); margin:0 auto 20px; }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.05em; color:var(--gold); margin-bottom:5px; }
+.modal-sub { font-size:13px; color:var(--text2); margin-bottom:18px; line-height:1.4; }
+.modal-btns { display:flex; gap:10px; margin-top:16px; }
+.modal-cancel { flex:1; padding:13px; border-radius:12px; border:1px solid var(--border); background:transparent; color:var(--text2); font-family:'Barlow',sans-serif; font-size:15px; cursor:pointer; }
+.modal-save { flex:1; padding:13px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#0a0c10; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:0.05em; cursor:pointer; }
+
+/* ── LOADING ── */
+.loading-bar { height:3px; background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold)); background-size:200% 100%; animation:loadBar 1.4s linear infinite; border-radius:2px; display:none; }
+.loading-bar.show { display:block; }
+@keyframes loadBar { 0%{background-position:100% 0;} 100%{background-position:-100% 0;} }
+
+.spinner-sm { display:inline-block; width:14px; height:14px; border:2px solid rgba(10,12,16,0.3); border-top-color:#0a0c10; border-radius:50%; animation:spin 0.6s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── EMPTY STATE ── */
+.empty { text-align:center; padding:48px 20px; }
+.empty .e-icon { font-size:44px; opacity:0.3; margin-bottom:12px; }
+.empty p { font-size:14px; color:var(--muted); line-height:1.5; }
+
+/* ── PROVIDER TABS ── */
+.provider-tabs { display:flex; gap:6px; margin-bottom:16px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+.provider-tabs::-webkit-scrollbar { display:none; }
+.provider-tab { flex-shrink:0; padding:7px 13px; border-radius:20px; border:1px solid var(--border2); background:transparent; color:var(--text2); font-family:'Barlow',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.provider-tab.active { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+
+/* ── PLAYER BUTTON ── */
+.player-btn { display:flex; align-items:center; gap:5px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:6px 12px; font-family:'Barlow',sans-serif; font-size:12px; font-weight:600; color:var(--text2); cursor:pointer; transition:all 0.2s; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.player-btn:active { border-color:var(--blue); color:var(--blue); }
+.player-btn.connected { border-color:rgba(41,121,255,0.5); color:var(--blue); background:rgba(41,121,255,0.08); }
+
+/* ── PLAYER MODAL ── */
+.player-list { max-height:55vh; overflow-y:auto; -webkit-overflow-scrolling:touch; margin-top:4px; }
+.player-card { display:flex; align-items:center; gap:12px; padding:13px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s; }
+.player-card.active-player { border-color:var(--blue); background:rgba(41,121,255,0.06); }
+.player-card:active { border-color:var(--gold); }
+.player-card-info { flex:1; min-width:0; }
+.player-card-name { font-weight:700; font-size:15px; color:var(--text); display:flex; align-items:center; gap:6px; }
+.player-card-meta { font-size:12px; color:var(--text2); margin-top:3px; }
+.player-card-notes { font-size:12px; color:var(--muted); margin-top:3px; font-style:italic; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.player-card-actions { display:flex; gap:6px; flex-shrink:0; }
+.icon-btn { background:var(--surface3); border:1px solid var(--border); border-radius:8px; padding:6px 9px; cursor:pointer; font-size:14px; line-height:1; }
+.active-badge { background:rgba(41,121,255,0.15); color:var(--blue); font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; }
+.modal-header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.modal-add-btn { background:var(--gold-dim); border:1px solid rgba(245,166,35,0.35); border-radius:20px; color:var(--gold); font-family:'Barlow',sans-serif; font-size:12px; font-weight:700; padding:6px 13px; cursor:pointer; }
+
+/* ── DRILL PLAYER TAG ── */
+.drill-player-tag { display:inline-block; font-size:10px; font-weight:700; color:var(--blue); background:rgba(41,121,255,0.12); border-radius:6px; padding:1px 6px; margin-left:5px; vertical-align:middle; }
+
+/* ── DRILL FILTER ── */
+.drill-filter-row { display:flex; gap:6px; padding:0 16px 10px; overflow-x:auto; scrollbar-width:none; }
+.drill-filter-row::-webkit-scrollbar { display:none; }
+.drill-filter-btn { flex-shrink:0; padding:5px 13px; border-radius:14px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-family:'Barlow',sans-serif; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s; }
+.drill-filter-btn.active { border-color:var(--blue); color:var(--blue); background:rgba(41,121,255,0.08); }
+
+/* ── PLAYERS PAGE ── */
+.players-page-list { padding:14px 16px; }
+</style>
+</head>
+<body>
+
+<!-- API KEY SHEET -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Connect AI</div>
+    <div class="modal-sub">Choose your AI provider. Keys are stored locally on your device only.</div>
+    <div class="provider-tabs" id="providerTabs">
+      <button class="provider-tab" data-p="diamondcoach" onclick="selectProvider('diamondcoach')">⭐ Pro <span style="font-size:9px;opacity:0.6">(soon)</span></button>
+      <button class="provider-tab" data-p="anthropic" onclick="selectProvider('anthropic')">Claude</button>
+      <button class="provider-tab" data-p="openai" onclick="selectProvider('openai')">GPT-4o</button>
+      <button class="provider-tab" data-p="gemini" onclick="selectProvider('gemini')">Gemini</button>
+    </div>
+    <div class="form-group">
+      <div class="form-label" id="apiKeyLabel">Subscription Key</div>
+      <input type="password" class="form-input" id="apiKeyInput" placeholder="DC-XXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div id="apiProviderHint" style="font-size:12px;color:var(--text2);margin-top:8px;line-height:1.5;padding:8px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">Subscribe at diamondcoach.app to get your key</div>
+    <div id="apiTestResult" style="display:none;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:500;margin-top:10px;line-height:1.4"></div>
+    <div class="modal-btns" style="flex-direction:column;gap:8px;margin-top:14px">
+      <div style="display:flex;gap:8px">
+        <button id="testBtn" class="modal-cancel" style="flex:1" onclick="testConnection()">🔌 Test</button>
+        <button class="modal-save" style="flex:1" onclick="saveApiKey()">✅ Save</button>
+      </div>
+      <button class="modal-cancel" style="width:100%;text-align:center" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER SHEET -->
+<div class="modal-overlay" id="playerModal">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+
+    <!-- LIST VIEW -->
+    <div id="playerListView">
+      <div class="modal-header-row">
+        <div class="modal-title" style="margin-bottom:0">Players</div>
+        <button class="modal-add-btn" onclick="showPlayerForm()">+ Add Player</button>
+      </div>
+      <div class="player-list" id="playerList"></div>
+      <button class="modal-cancel" style="width:100%;margin-top:10px" onclick="closePlayerModal()">Close</button>
+    </div>
+
+    <!-- FORM VIEW -->
+    <div id="playerFormView" style="display:none">
+      <div class="modal-header-row">
+        <div class="modal-title" style="margin-bottom:0" id="playerFormTitle">Add Player</div>
+      </div>
+      <input type="hidden" id="editingPlayerId">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="form-group">
+          <div class="form-label">Name *</div>
+          <input type="text" class="form-input" id="pName" placeholder="Player name">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <div class="form-label">Position</div>
+            <select class="form-select" id="pPosition">
+              <option>Pitcher</option><option>Catcher</option><option>First Base</option>
+              <option>Second Base</option><option>Shortstop</option><option>Third Base</option>
+              <option>Left Field</option><option>Center Field</option><option>Right Field</option>
+              <option>Multi-Position</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Level</div>
+            <select class="form-select" id="pLevel">
+              <option>Little League</option><option>Travel Ball</option><option>Middle School</option>
+              <option>High School</option><option>College</option><option>Pro</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="form-group">
+            <div class="form-label">Bats</div>
+            <select class="form-select" id="pBats">
+              <option>Right</option><option>Left</option><option>Switch</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Throws</div>
+            <select class="form-select" id="pThrows">
+              <option>Right</option><option>Left</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Age</div>
+            <input type="number" class="form-input" id="pAge" placeholder="14" inputmode="numeric">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Notes</div>
+          <textarea class="form-textarea" id="pNotes" placeholder="Strengths, weaknesses, goals..." style="min-height:70px"></textarea>
+        </div>
+      </div>
+      <div class="modal-btns" style="margin-top:14px">
+        <button class="modal-cancel" onclick="showPlayerList()">← Back</button>
+        <button class="modal-save" onclick="savePlayer()">Save Player</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRO MODAL -->
+<div id="proModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header-row">
+      <div class="modal-title">⭐ CoachAI Pro</div>
+      <button class="modal-close" onclick="closeProModal()">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:4px">Unlock every sport, unlimited AI, and more.</p>
+
+    <!-- Plan cards -->
+    <div class="plan-row">
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-divider"></div>
+        <div class="plan-feat good">⚾ Baseball only</div>
+        <div class="plan-feat">5 analyses / day</div>
+        <div class="plan-feat">10 coach msgs / day</div>
+        <div class="plan-feat">Up to 2 players</div>
+        <div class="plan-feat locked-feat">🔒 Hockey, Basketball…</div>
+        <div class="plan-feat locked-feat">🔒 DiamondCoach AI</div>
+      </div>
+      <!-- Pro -->
+      <div class="plan-card pro-card">
+        <div class="plan-top-badge">BEST VALUE</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$9.99<span>/mo</span></div>
+        <div class="plan-divider"></div>
+        <div class="plan-feat good">✅ All 4 sports</div>
+        <div class="plan-feat good">✅ Unlimited analyses</div>
+        <div class="plan-feat good">✅ Unlimited coaching</div>
+        <div class="plan-feat good">✅ Unlimited players</div>
+        <div class="plan-feat good">✅ DiamondCoach AI</div>
+        <div class="plan-feat good">✅ Priority support</div>
+        <button class="plan-subscribe-btn" onclick="subscribePro()">Subscribe Now →</button>
+      </div>
+    </div>
+
+    <!-- Already have a key -->
+    <div class="pro-activate-wrap" id="proActivateWrap">
+      <div class="form-label" style="font-size:12px">Already subscribed? Activate with your license key:</div>
+      <div class="pro-activate-row">
+        <input type="text" class="form-input" id="proKeyInput" placeholder="DC-PRO-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase">
+        <button class="pro-activate-btn" onclick="activateProKey()">Activate</button>
+      </div>
+      <div class="pro-key-result" id="proKeyResult"></div>
+    </div>
+
+    <!-- Active Pro status (shown when Pro) -->
+    <div class="pro-manage-wrap" id="proManageWrap" style="display:none">
+      <div class="pro-manage-icon">⭐</div>
+      <div class="pro-manage-info">
+        <div class="pro-manage-title">Pro Active</div>
+        <div class="pro-manage-sub" id="proManageKey"></div>
+      </div>
+      <span class="pro-cancel-link" onclick="deactivatePro()">Deactivate</span>
+    </div>
+
+    <button class="modal-cancel" onclick="closeProModal()">Maybe later</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="logo-wrap">
+      <div class="logo-text"><span id="sportIcon">⚾</span> CoachAI</div>
+      <div class="logo-badge">AI</div>
+    </div>
+    <div class="header-right">
+      <button class="key-btn" id="upgradeBtn" onclick="openProModal()">⬆️ Upgrade</button>
+      <button class="player-btn" id="playerBtn" onclick="openPlayerModal()">👤 Player</button>
+      <button class="key-btn" id="keyBtn" onclick="openModal()">🔑 Connect</button>
+    </div>
+  </div>
+
+  <!-- SPORT STRIP -->
+  <div class="sport-strip" id="sportStrip" style="display:none"></div>
+
+  <!-- MODULE STRIP (shown on Analyze tab) -->
+  <div class="module-strip" id="moduleStrip" style="display:none"></div>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content" id="pageContent">
+
+    <!-- ═══ ANALYZE PAGE ═══ -->
+    <div class="page active" id="page-analyze">
+
+      <!-- VIDEO -->
+      <div class="section" style="padding-top:14px">
+        <div class="card" id="uploadCard">
+          <div class="card-label">📹 Video</div>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" accept="video/*" onchange="handleVideo(event)">
+            <div class="upload-icon">🎬</div>
+            <div class="upload-text">Tap to upload video</div>
+            <div class="upload-sub">From camera roll or files</div>
+          </div>
+          <div class="video-wrap" id="videoWrap">
+            <video id="videoPlayer" controls playsinline></video>
+          </div>
+          <!-- Video action bar (shown after upload) -->
+          <div class="video-controls" id="videoControls">
+            <label class="vid-ctrl-btn replace">
+              🔄 Replace
+              <input type="file" accept="video/*" onchange="handleVideo(event)">
+            </label>
+            <button class="vid-ctrl-btn danger" onclick="removeVideo()">✕ Remove</button>
+          </div>
+        </div>
+
+        <!-- FOCUS AREAS -->
+        <div class="card" id="focusCard">
+          <div class="card-label">🎯 Focus Areas</div>
+          <div class="focus-grid" id="focusGrid"></div>
+        </div>
+
+        <!-- USAGE METER (free tier only) -->
+        <div id="usageMeter" style="display:none"></div>
+
+        <!-- ANALYZE BUTTON -->
+        <div class="loading-bar" id="loadingBar"></div>
+        <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()" style="margin-bottom:12px">
+          ⚡ ANALYZE NOW
+        </button>
+
+        <!-- RESULTS -->
+        <div id="resultsSection" style="display:none">
+          <div class="card">
+            <div class="card-label">📊 Grades</div>
+            <div class="grade-strip" id="gradeStrip"></div>
+            <p style="font-size:12px;color:var(--muted);margin-top:6px">Tap a grade to jump to its correction plan</p>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="card-label" style="padding:14px 16px 0;margin-bottom:0">🧠 Analysis Summary</div>
+            <div class="analysis-text" id="analysisSummary"></div>
+          </div>
+
+          <!-- CORRECTION PLANS -->
+          <div id="correctionPlans" style="margin-bottom:12px"></div>
+
+          <!-- ANALYSIS HISTORY (past sessions for this player+mod) -->
+          <div id="analysisHistoryPanel" style="display:none;margin-bottom:12px"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ DRILLS PAGE ═══ -->
+    <div class="page" id="page-drills">
+      <div class="section" style="padding-top:14px">
+        <div class="stats-row" id="drillStats"></div>
+
+        <div class="card">
+          <div class="card-label">➕ Log Drill</div>
+          <div class="drill-form">
+            <div class="form-group">
+              <div class="form-label">Drill Name</div>
+              <input type="text" class="form-input" id="drillName" placeholder="Tee Work, Box Catches...">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <div class="form-label">Type</div>
+                <select class="form-select" id="drillType"></select>
+              </div>
+              <div class="form-group">
+                <div class="form-label">Reps/Min</div>
+                <input type="number" class="form-input" id="drillReps" placeholder="50" inputmode="numeric">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label">Date</div>
+              <input type="date" class="form-input" id="drillDate">
+            </div>
+            <div class="form-group">
+              <div class="form-label">Notes</div>
+              <textarea class="form-textarea" id="drillNotes" placeholder="What clicked? What needs work?"></textarea>
+            </div>
+            <button class="submit-btn" onclick="addDrill()">✅ LOG THIS DRILL</button>
+          </div>
+        </div>
+
+        <div class="drill-filter-row" id="drillFilterRow"></div>
+        <div id="drillList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ COACH PAGE ═══ -->
+    <div class="page" id="page-coach" style="display:none;flex-direction:column;height:calc(100vh - 180px)">
+      <div class="quick-row" id="quickRow"></div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg assistant">
+          <div class="m-avatar" id="coachAvatar">⚾</div>
+          <div class="m-bubble" id="coachWelcome"><strong>Coach here.</strong> What are we fixing today? Hitting, catching, throwing, baserunning, fielding — ask me anything and I'll give you a real plan.</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask your coach..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+
+    <!-- ═══ PLAYERS PAGE ═══ -->
+    <div class="page" id="page-players">
+      <div class="section" style="padding-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.05em;color:var(--text)">👤 Player <span style="color:var(--gold)">Roster</span></div>
+          <button class="modal-add-btn" onclick="openPlayerModal();showPlayerForm()">+ Add</button>
+        </div>
+        <div id="playersPageList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ FIELD PAGE ═══ -->
+    <div class="page" id="page-field">
+      <div class="section" style="padding-top:14px">
+        <div class="field-wrap" id="fieldWrap"></div>
+        <div id="posCoachArea"></div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('analyze')" id="nav-analyze">
+      <div class="n-icon">🔍</div>
+      <div class="n-label">Analyze</div>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="switchTab('drills')" id="nav-drills">
+      <div class="n-icon">📋</div>
+      <div class="n-label">Drills</div>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="switchTab('coach')" id="nav-coach">
+      <div class="n-icon">🎙️</div>
+      <div class="n-label">Coach</div>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="switchTab('field')" id="nav-field">
+      <div class="n-icon">📍</div>
+      <div class="n-label">Positions</div>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="switchTab('players')" id="nav-players">
+      <div class="n-icon">👤</div>
+      <div class="n-label">Players</div>
+      <div class="nav-dot"></div>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<div id="confirmModal">
+  <div class="confirm-box">
+    <p id="confirmMsg"></p>
+    <div class="confirm-actions">
+      <button id="confirmNo">Cancel</button>
+      <button id="confirmYes">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let apiKey = localStorage.getItem('dc_api') || '';
+let currentProvider = localStorage.getItem('dc_provider') || 'anthropic';
+let players = JSON.parse(localStorage.getItem('dc_players') || '[]');
+let currentPlayerId = localStorage.getItem('dc_current_player') || null;
+let drillFilter = null;
+function currentPlayer() { return players.find(p => p.id === currentPlayerId) || null; }
+
+// ═══════════════════════════════════════════
+// PROVIDER CONFIG
+// ═══════════════════════════════════════════
+const PROVIDERS = {
+  diamondcoach: {
+    name: 'DiamondCoach Pro',
+    keyLabel: 'Subscription Key',
+    placeholder: 'DC-XXXXXXXXXXXX',
+    hint: '⭐ DiamondCoach Pro subscription — coming soon. Use Claude, GPT-4o, or Gemini in the meantime.',
+  },
+  anthropic: {
+    name: 'Claude (Anthropic)',
+    keyLabel: 'Anthropic API Key',
+    placeholder: 'sk-ant-api03-...',
+    hint: 'Get your key at console.anthropic.com → API Keys. Requires billing setup.',
+  },
+  openai: {
+    name: 'GPT-4o (OpenAI)',
+    keyLabel: 'OpenAI API Key',
+    placeholder: 'sk-proj-...',
+    hint: 'Get your key at platform.openai.com → API Keys. Requires billing setup.',
+  },
+  gemini: {
+    name: 'Gemini (Google)',
+    keyLabel: 'Gemini API Key',
+    placeholder: 'AIzaSy...',
+    hint: 'Get your free key at aistudio.google.com → Get API Key.',
+  },
+};
+
+// ═══════════════════════════════════════════
+// MULTI-PROVIDER AI ROUTER
+// ═══════════════════════════════════════════
+const isNative = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
+async function httpPost(url, headers, data) {
+  if (isNative()) {
+    const { CapacitorHttp } = window.Capacitor.Plugins;
+    const r = await CapacitorHttp.request({ method: 'POST', url, headers, data });
+    return r.data;
+  }
+  const r = await fetch(url, { method: 'POST', headers, body: JSON.stringify(data) });
+  return r.json();
+}
+
+// Normalises any provider response → { content: [{ text: '...' }] }
+async function callAI(payload) {
+  const p = currentProvider;
+  const k = apiKey;
+  if (!k) throw new Error('No API key set — tap Connect to add one.');
+
+  if (p === 'openai') {
+    const msgs = [];
+    if (payload.system) msgs.push({ role: 'system', content: payload.system });
+    msgs.push(...payload.messages);
+    const data = await httpPost(
+      'https://api.openai.com/v1/chat/completions',
+      { 'Content-Type': 'application/json', 'Authorization': `Bearer ${k}` },
+      { model: 'gpt-4o', max_tokens: payload.max_tokens || 4096, messages: msgs }
+    );
+    if (data.error) throw new Error(data.error.message);
+    return { content: [{ text: data.choices[0].message.content }] };
+  }
+
+  if (p === 'gemini') {
+    const parts = [];
+    if (payload.system) parts.push({ text: payload.system + '\n\n' });
+    for (const m of payload.messages) parts.push({ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) });
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`;
+    const data = await httpPost(
+      url,
+      { 'Content-Type': 'application/json' },
+      { contents: [{ role: 'user', parts }], generationConfig: { maxOutputTokens: payload.max_tokens || 4096 } }
+    );
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    return { content: [{ text: data.candidates[0].content.parts[0].text }] };
+  }
+
+  if (p === 'diamondcoach') {
+    const endpoint = localStorage.getItem('dc_endpoint') || 'https://api.diamondcoach.app/v1/messages';
+    const data = await httpPost(
+      endpoint,
+      { 'Content-Type': 'application/json', 'x-subscription-key': k },
+      payload
+    );
+    if (data.error) throw new Error(data.error.message || data.error);
+    return data;
+  }
+
+  // Default: Anthropic Claude
+  const data = await httpPost(
+    'https://api.anthropic.com/v1/messages',
+    { 'Content-Type': 'application/json', 'x-api-key': k, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    payload
+  );
+  if (data.error) throw new Error(data.error.message);
+  return data;
+}
+
+let currentTab = 'analyze';
+let currentSport = localStorage.getItem('dc_sport') || 'baseball';
+let currentMod = localStorage.getItem('dc_mod') || 'hitting';
+let selectedFocuses = [];
+
+// ── PRO / SUBSCRIPTION STATE ──
+let isPro  = localStorage.getItem('dc_is_pro')  === 'true';
+let proKey = localStorage.getItem('dc_pro_key') || '';
+const FREE_LIMITS  = { analyses: 5, chat: 10, players: 2 };
+const BACKEND_URL  = 'https://api.diamondcoach.app'; // ← update after deploying backend
+
+// Persistent device ID (survives reinstall if same device storage)
+function getDeviceId() {
+  let id = localStorage.getItem('dc_device_id');
+  if (!id) { id = 'dev_' + Math.random().toString(36).slice(2, 11) + Date.now().toString(36); localStorage.setItem('dc_device_id', id); }
+  return id;
+}
+let videoFile = null;
+let drills    = JSON.parse(localStorage.getItem('dc_drills2')   || '[]');
+let analyses  = JSON.parse(localStorage.getItem('dc_analyses')  || '[]');
+let chatHistory = [];
+
+// ═══════════════════════════════════════════
+// MULTI-SPORT CONFIG
+// ═══════════════════════════════════════════
+const ALL_SPORTS = {
+  baseball: {
+    name:'Baseball', icon:'⚾', accentColor:'#f5a623',
+    drillTypes:['Hitting','Catching','Throwing','Baserunning','Fielding'],
+    playerPositions:['Pitcher','Catcher','First Base','Second Base','Shortstop','Third Base','Left Field','Center Field','Right Field','Multi-Position'],
+    coachPersona:'elite baseball coach with expertise in hitting, catching, throwing, baserunning, and fielding',
+    coachIntro:'What are we fixing today? Hitting, catching, throwing, baserunning, fielding — ask me anything and I\'ll give you a real plan.',
+    fieldPrompt:'You are an elite baseball coach. Be specific, practical, and direct. Use **bold** for headers. Keep responses under 350 words.',
+    fieldQuestion: pos => `Complete coaching breakdown for the ${pos} position: 1) Setup and positioning, 2) Key mechanics unique to this position, 3) Most critical skill to develop, 4) 2 must-do position-specific drills with reps, 5) What scouts look for.`,
+    fieldEmptyMsg:'Tap any position on the diamond above to get coaching tips.',
+    fieldSVG:`<ellipse cx="150" cy="185" rx="142" ry="155" fill="#1d4a1d"/>
+      <polygon points="150,100 228,178 150,256 72,178" fill="#7a5a0a" opacity="0.4"/>
+      <line x1="150" y1="256" x2="52" y2="82" stroke="white" stroke-width="1" opacity="0.22"/>
+      <line x1="150" y1="256" x2="248" y2="82" stroke="white" stroke-width="1" opacity="0.22"/>
+      <rect x="144" y="93" width="12" height="12" fill="white" rx="1" transform="rotate(45 150 99)"/>
+      <rect x="222" y="172" width="12" height="12" fill="white" rx="1" transform="rotate(45 228 178)"/>
+      <rect x="66" y="172" width="12" height="12" fill="white" rx="1" transform="rotate(45 72 178)"/>
+      <polygon points="150,252 143,258 143,264 157,264 157,258" fill="white"/>
+      <rect x="145" y="168" width="10" height="4" fill="white" rx="1"/>`,
+    positions:[
+      {id:'P',  label:'Pitcher',      x:'50%', y:'41%'},
+      {id:'C',  label:'Catcher',      x:'50%', y:'87%'},
+      {id:'1B', label:'First Base',   x:'72%', y:'63%'},
+      {id:'2B', label:'Second Base',  x:'63%', y:'43%'},
+      {id:'3B', label:'Third Base',   x:'28%', y:'63%'},
+      {id:'SS', label:'Shortstop',    x:'37%', y:'43%'},
+      {id:'LF', label:'Left Field',   x:'21%', y:'22%'},
+      {id:'CF', label:'Center Field', x:'50%', y:'13%'},
+      {id:'RF', label:'Right Field',  x:'79%', y:'22%'},
+    ],
+    mods:{
+      hitting:{
+        label:'Hitting', icon:'🏏',
+        persona:'elite hitting coach with 20+ years training professional and college hitters',
+        focuses:[
+          {id:'stance',icon:'🦶',label:'Stance & Setup'},
+          {id:'load',icon:'⬅️',label:'Load & Coil'},
+          {id:'swing',icon:'🔄',label:'Swing Path'},
+          {id:'contact',icon:'💥',label:'Contact Point'},
+          {id:'hips',icon:'🌀',label:'Hip Rotation'},
+          {id:'follow',icon:'➡️',label:'Follow Through'},
+        ]
+      },
+      catching:{
+        label:'Catching', icon:'🥊',
+        persona:'professional catching instructor who has trained MLB catchers',
+        focuses:[
+          {id:'setup',icon:'🪑',label:'Setup & Stance'},
+          {id:'receiving',icon:'🤲',label:'Receiving'},
+          {id:'framing',icon:'🖼️',label:'Pitch Framing'},
+          {id:'blocking',icon:'🛡️',label:'Blocking'},
+          {id:'poptime',icon:'⏱️',label:'Pop Time'},
+          {id:'throwc',icon:'💪',label:'Throwing'},
+        ]
+      },
+      throwing:{
+        label:'Throwing', icon:'💪',
+        persona:'pitching and arm care specialist who has trained professional pitchers and position players',
+        focuses:[
+          {id:'grip',icon:'✋',label:'Grip'},
+          {id:'armaction',icon:'🔄',label:'Arm Action'},
+          {id:'release',icon:'🎯',label:'Release Point'},
+          {id:'footworkt',icon:'🦶',label:'Footwork'},
+          {id:'followt',icon:'➡️',label:'Follow Through'},
+          {id:'velocity',icon:'⚡',label:'Velocity Keys'},
+        ]
+      },
+      running:{
+        label:'Baserunning', icon:'🏃',
+        persona:'speed specialist and baserunning coach with professional baseball experience',
+        focuses:[
+          {id:'sprint',icon:'⚡',label:'Sprint Mechanics'},
+          {id:'turnfirst',icon:'↩️',label:'Turn at First'},
+          {id:'leads',icon:'↔️',label:'Leads & Reads'},
+          {id:'steal',icon:'🚀',label:'Steal Jump'},
+          {id:'rounding',icon:'🔄',label:'Rounding Bases'},
+          {id:'slides',icon:'🛝',label:'Sliding'},
+        ]
+      },
+      fielding:{
+        label:'Fielding', icon:'🧤',
+        persona:'defensive specialist and fielding coach with professional-level experience',
+        focuses:[
+          {id:'footworkf',icon:'🦶',label:'Footwork'},
+          {id:'positioning',icon:'📍',label:'Positioning'},
+          {id:'range',icon:'↔️',label:'Range & Reads'},
+          {id:'transfer',icon:'🔄',label:'Catch & Transfer'},
+          {id:'backhand',icon:'↪️',label:'Backhand'},
+          {id:'throwf',icon:'💪',label:'Throwing After'},
+        ]
+      }
+    }
+  },
+
+  hockey: {
+    name:'Hockey', icon:'🏒', accentColor:'#2979ff',
+    drillTypes:['Skating','Shooting','Stickhandling','Goaltending','Defense'],
+    playerPositions:['Center','Left Wing','Right Wing','Left Defense','Right Defense','Goalie'],
+    coachPersona:'elite hockey coach with expertise in skating, shooting, stickhandling, goaltending, and defense',
+    coachIntro:'What are we working on? Skating, shooting, stickhandling, goaltending, defense — ask me anything and I\'ll give you a real plan.',
+    fieldPrompt:'You are an elite hockey coach. Be specific, practical, and direct. Use **bold** for headers. Keep responses under 350 words.',
+    fieldQuestion: pos => `Complete coaching breakdown for the ${pos} position in hockey: 1) On-ice positioning and responsibilities, 2) Key skills unique to this position, 3) Most critical skill to develop, 4) 2 must-do position-specific drills with reps, 5) What scouts and coaches look for.`,
+    fieldEmptyMsg:'Tap any position on the rink above to get coaching tips.',
+    fieldSVG:`<rect x="8" y="12" width="284" height="276" rx="30" fill="#d6eef8" stroke="#9bbdd4" stroke-width="2"/>
+      <line x1="8" y1="150" x2="292" y2="150" stroke="red" stroke-width="3"/>
+      <line x1="8" y1="96" x2="292" y2="96" stroke="#2979ff" stroke-width="2.5"/>
+      <line x1="8" y1="204" x2="292" y2="204" stroke="#2979ff" stroke-width="2.5"/>
+      <circle cx="150" cy="150" r="22" fill="none" stroke="red" stroke-width="2"/>
+      <circle cx="150" cy="150" r="3" fill="red"/>
+      <circle cx="80" cy="68" r="18" fill="none" stroke="red" stroke-width="1.5"/>
+      <circle cx="220" cy="68" r="18" fill="none" stroke="red" stroke-width="1.5"/>
+      <circle cx="80" cy="232" r="18" fill="none" stroke="red" stroke-width="1.5"/>
+      <circle cx="220" cy="232" r="18" fill="none" stroke="red" stroke-width="1.5"/>
+      <rect x="115" y="12" width="70" height="22" fill="none" stroke="red" stroke-width="1.5"/>
+      <path d="M125,12 A25,20 0 0,1 175,12" fill="rgba(173,216,230,0.5)" stroke="red" stroke-width="1"/>
+      <rect x="115" y="266" width="70" height="22" fill="none" stroke="red" stroke-width="1.5"/>
+      <path d="M125,288 A25,20 0 0,0 175,288" fill="rgba(173,216,230,0.5)" stroke="red" stroke-width="1"/>`,
+    positions:[
+      {id:'G',  label:'Goalie',        x:'50%', y:'86%'},
+      {id:'LD', label:'Left Defense',  x:'26%', y:'67%'},
+      {id:'RD', label:'Right Defense', x:'74%', y:'67%'},
+      {id:'C',  label:'Center',        x:'50%', y:'48%'},
+      {id:'LW', label:'Left Wing',     x:'18%', y:'30%'},
+      {id:'RW', label:'Right Wing',    x:'82%', y:'30%'},
+    ],
+    mods:{
+      skating:{
+        label:'Skating', icon:'⛸️',
+        persona:'elite skating coach and power skating instructor with professional hockey experience',
+        focuses:[
+          {id:'stride',icon:'🦵',label:'Forward Stride'},
+          {id:'backward',icon:'↩️',label:'Backward Skating'},
+          {id:'crossovers',icon:'❌',label:'Crossovers'},
+          {id:'edges',icon:'⚡',label:'Edge Work'},
+          {id:'stops',icon:'🛑',label:'Stops & Starts'},
+          {id:'agility',icon:'🔄',label:'Agility & Turns'},
+        ]
+      },
+      shooting:{
+        label:'Shooting', icon:'🏑',
+        persona:'elite hockey shooting coach who has trained professional and college scorers',
+        focuses:[
+          {id:'wristshot',icon:'💫',label:'Wrist Shot'},
+          {id:'slapshot',icon:'💥',label:'Slap Shot'},
+          {id:'snapshot',icon:'⚡',label:'Snap Shot'},
+          {id:'backhandh',icon:'↪️',label:'Backhand'},
+          {id:'deflect',icon:'🎯',label:'Deflections'},
+          {id:'onetimer',icon:'🔄',label:'One-Timers'},
+        ]
+      },
+      stickhandling:{
+        label:'Stickhandling', icon:'🏒',
+        persona:'elite stickhandling and puck control coach with professional hockey experience',
+        focuses:[
+          {id:'puckprot',icon:'🛡️',label:'Puck Protection'},
+          {id:'dekes',icon:'🎭',label:'Dekes & Moves'},
+          {id:'handspeed',icon:'⚡',label:'Hand Speed'},
+          {id:'tightturns',icon:'🔄',label:'Tight Turns'},
+          {id:'boardplay',icon:'🏟️',label:'Board Play'},
+          {id:'passingh',icon:'➡️',label:'Passing'},
+        ]
+      },
+      goaltending:{
+        label:'Goaltending', icon:'🥅',
+        persona:'professional goaltending coach who has trained NHL-caliber goalies',
+        focuses:[
+          {id:'gposition',icon:'📍',label:'Positioning'},
+          {id:'butterfly',icon:'🦋',label:'Butterfly'},
+          {id:'glovehand',icon:'🥊',label:'Glove Hand'},
+          {id:'blockerside',icon:'🛡️',label:'Blocker Side'},
+          {id:'rebound',icon:'🔄',label:'Rebound Control'},
+          {id:'breakaway',icon:'🚀',label:'Breakaways'},
+        ]
+      },
+      hdefense:{
+        label:'Defense', icon:'🛡️',
+        persona:'elite defensive hockey coach specializing in gap control and defensive-zone coverage',
+        focuses:[
+          {id:'gap',icon:'↔️',label:'Gap Control'},
+          {id:'angling',icon:'📐',label:'Angling'},
+          {id:'battles',icon:'💪',label:'Puck Battles'},
+          {id:'dzone',icon:'📍',label:'D-Zone Coverage'},
+          {id:'pinching',icon:'🔼',label:'Pinching'},
+          {id:'shotblock',icon:'🛡️',label:'Shot Blocking'},
+        ]
+      }
+    }
+  },
+
+  basketball: {
+    name:'Basketball', icon:'🏀', accentColor:'#ff6d00',
+    drillTypes:['Shooting','Ball Handling','Defense','Post Play','Passing'],
+    playerPositions:['Point Guard','Shooting Guard','Small Forward','Power Forward','Center'],
+    coachPersona:'elite basketball coach with expertise in shooting, ball handling, defense, post play, and passing',
+    coachIntro:'What are we working on? Shooting, ball handling, defense, post play, passing — ask me anything and I\'ll give you a real plan.',
+    fieldPrompt:'You are an elite basketball coach. Be specific, practical, and direct. Use **bold** for headers. Keep responses under 350 words.',
+    fieldQuestion: pos => `Complete coaching breakdown for the ${pos} position in basketball: 1) On-court responsibilities and positioning, 2) Key skills unique to this position, 3) Most critical skill to develop, 4) 2 must-do position-specific drills with reps, 5) What coaches and scouts look for.`,
+    fieldEmptyMsg:'Tap any position on the court above to get coaching tips.',
+    fieldSVG:`<rect x="10" y="10" width="280" height="280" fill="#c8a96e" stroke="#8B6914" stroke-width="2"/>
+      <rect x="10" y="10" width="280" height="280" fill="none" stroke="white" stroke-width="2"/>
+      <line x1="10" y1="150" x2="290" y2="150" stroke="white" stroke-width="1.5"/>
+      <circle cx="150" cy="150" r="22" fill="none" stroke="white" stroke-width="1.5"/>
+      <circle cx="150" cy="150" r="3" fill="white"/>
+      <rect x="90" y="10" width="120" height="82" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1.5"/>
+      <rect x="110" y="10" width="80" height="52" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1"/>
+      <circle cx="150" cy="92" r="20" fill="none" stroke="white" stroke-width="1.5"/>
+      <circle cx="150" cy="20" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+      <path d="M52,10 A108,108 0 0,1 248,10" fill="none" stroke="white" stroke-width="1.5"/>
+      <rect x="90" y="208" width="120" height="82" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1.5"/>
+      <rect x="110" y="238" width="80" height="52" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1"/>
+      <circle cx="150" cy="208" r="20" fill="none" stroke="white" stroke-width="1.5"/>
+      <circle cx="150" cy="280" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+      <path d="M52,290 A108,108 0 0,0 248,290" fill="none" stroke="white" stroke-width="1.5"/>`,
+    positions:[
+      {id:'PG', label:'Point Guard',    x:'50%', y:'80%'},
+      {id:'SG', label:'Shooting Guard', x:'80%', y:'63%'},
+      {id:'SF', label:'Small Forward',  x:'20%', y:'63%'},
+      {id:'PF', label:'Power Forward',  x:'72%', y:'36%'},
+      {id:'C',  label:'Center',         x:'50%', y:'29%'},
+    ],
+    mods:{
+      shooting:{
+        label:'Shooting', icon:'🎯',
+        persona:'elite shooting coach who has trained professional and college basketball players',
+        focuses:[
+          {id:'catchshoot',icon:'⚡',label:'Catch & Shoot'},
+          {id:'offdribble',icon:'🔄',label:'Off Dribble'},
+          {id:'midrange',icon:'📍',label:'Mid-Range'},
+          {id:'threepoint',icon:'🎯',label:'Three Point'},
+          {id:'freethrow',icon:'🏀',label:'Free Throw'},
+          {id:'shotfoot',icon:'🦶',label:'Footwork'},
+        ]
+      },
+      ballhandling:{
+        label:'Ball Handling', icon:'🏀',
+        persona:'elite ball handling and guard skills coach with professional basketball experience',
+        focuses:[
+          {id:'basicdrib',icon:'🔄',label:'Basic Dribbling'},
+          {id:'crossoverb',icon:'❌',label:'Crossover'},
+          {id:'betweenlegs',icon:'🦵',label:'Between Legs'},
+          {id:'behindback',icon:'↩️',label:'Behind Back'},
+          {id:'pace',icon:'⚡',label:'Change of Pace'},
+          {id:'offhand',icon:'✋',label:'Weak Hand'},
+        ]
+      },
+      bdefense:{
+        label:'Defense', icon:'🛡️',
+        persona:'elite defensive basketball coach specializing in individual and team defense',
+        focuses:[
+          {id:'onball',icon:'👊',label:'On-Ball Defense'},
+          {id:'helpdef',icon:'🛡️',label:'Help Defense'},
+          {id:'pickroll',icon:'🔄',label:'Pick & Roll D'},
+          {id:'closeout',icon:'⚡',label:'Closeouts'},
+          {id:'rebounding',icon:'🏀',label:'Rebounding'},
+          {id:'dposition',icon:'📍',label:'Positioning'},
+        ]
+      },
+      postplay:{
+        label:'Post Play', icon:'💪',
+        persona:'elite post play coach who has trained professional big men and forwards',
+        focuses:[
+          {id:'lowpost',icon:'📍',label:'Low Post Moves'},
+          {id:'midpost',icon:'🎯',label:'Mid-Post'},
+          {id:'dropstep',icon:'🦶',label:'Drop Step'},
+          {id:'jumphook',icon:'↗️',label:'Jump Hook'},
+          {id:'spinmove',icon:'🔄',label:'Spin Move'},
+          {id:'postdef',icon:'🛡️',label:'Post Defense'},
+        ]
+      },
+      passing:{
+        label:'Passing & Vision', icon:'👁️',
+        persona:'elite passing and playmaking coach with professional basketball experience',
+        focuses:[
+          {id:'chestpass',icon:'💪',label:'Chest Pass'},
+          {id:'bouncepass',icon:'⬇️',label:'Bounce Pass'},
+          {id:'skippass',icon:'↗️',label:'Skip Pass'},
+          {id:'drivekick',icon:'🔄',label:'Drive & Kick'},
+          {id:'pnrpass',icon:'📍',label:'Pick & Roll Pass'},
+          {id:'vision',icon:'👁️',label:'Decision Making'},
+        ]
+      }
+    }
+  },
+
+  football: {
+    name:'Football', icon:'🏈', accentColor:'#00c853',
+    drillTypes:['QB','Receiving','O-Line','Defense','Running Back'],
+    playerPositions:['Quarterback','Running Back','Wide Receiver','Tight End','Offensive Line','Cornerback','Safety','Linebacker','Defensive Line'],
+    coachPersona:'elite football coach with expertise in all positions — QB, receiving, O-Line, defense, and running backs',
+    coachIntro:'What position are we working on? QB mechanics, route running, O-Line, defense, or running back — ask me anything.',
+    fieldPrompt:'You are an elite football coach. Be specific, practical, and direct. Use **bold** for headers. Keep responses under 350 words.',
+    fieldQuestion: pos => `Complete coaching breakdown for the ${pos} position in football: 1) On-field alignment and responsibilities, 2) Key skills unique to this position, 3) Most critical skill to develop, 4) 2 must-do position-specific drills with reps, 5) What coaches and scouts look for.`,
+    fieldEmptyMsg:'Tap any position on the field above to get coaching tips.',
+    fieldSVG:`<rect x="10" y="10" width="280" height="280" fill="#2d7a2d" stroke="#1a5c1a" stroke-width="2"/>
+      <rect x="10" y="10" width="280" height="40" fill="rgba(255,255,255,0.12)"/>
+      <rect x="10" y="250" width="280" height="40" fill="rgba(255,255,255,0.12)"/>
+      <line x1="10" y1="50" x2="290" y2="50" stroke="white" stroke-width="1.5" opacity="0.8"/>
+      <line x1="10" y1="90" x2="290" y2="90" stroke="white" stroke-width="1" opacity="0.5"/>
+      <line x1="10" y1="130" x2="290" y2="130" stroke="white" stroke-width="1" opacity="0.5"/>
+      <line x1="10" y1="170" x2="290" y2="170" stroke="white" stroke-width="2" opacity="0.9"/>
+      <line x1="10" y1="210" x2="290" y2="210" stroke="white" stroke-width="1" opacity="0.5"/>
+      <line x1="10" y1="250" x2="290" y2="250" stroke="white" stroke-width="1.5" opacity="0.8"/>
+      <text x="150" y="35" text-anchor="middle" fill="white" font-size="10" opacity="0.8" font-family="sans-serif" font-weight="bold">END ZONE</text>
+      <text x="150" y="270" text-anchor="middle" fill="white" font-size="10" opacity="0.8" font-family="sans-serif" font-weight="bold">END ZONE</text>
+      <text x="150" y="162" text-anchor="middle" fill="white" font-size="9" opacity="0.6" font-family="sans-serif">LINE OF SCRIMMAGE</text>
+      <line x1="100" y1="140" x2="100" y2="170" stroke="white" stroke-width="0.5" opacity="0.3"/>
+      <line x1="130" y1="140" x2="130" y2="170" stroke="white" stroke-width="0.5" opacity="0.3"/>
+      <line x1="160" y1="140" x2="160" y2="170" stroke="white" stroke-width="0.5" opacity="0.3"/>
+      <line x1="190" y1="140" x2="190" y2="170" stroke="white" stroke-width="0.5" opacity="0.3"/>
+      <line x1="220" y1="140" x2="220" y2="170" stroke="white" stroke-width="0.5" opacity="0.3"/>`,
+    positions:[
+      {id:'QB',  label:'Quarterback',    x:'50%', y:'59%'},
+      {id:'RB',  label:'Running Back',   x:'50%', y:'72%'},
+      {id:'WR',  label:'Wide Receiver L',x:'12%', y:'61%'},
+      {id:'WR2', label:'Wide Receiver R',x:'88%', y:'61%'},
+      {id:'TE',  label:'Tight End',      x:'73%', y:'55%'},
+      {id:'OL',  label:'O-Line',         x:'50%', y:'49%'},
+      {id:'CB',  label:'Cornerback L',   x:'12%', y:'38%'},
+      {id:'CB2', label:'Cornerback R',   x:'88%', y:'38%'},
+      {id:'LB',  label:'Linebacker',     x:'50%', y:'30%'},
+    ],
+    mods:{
+      qb:{
+        label:'Quarterback', icon:'🏈',
+        persona:'elite quarterback coach who has trained professional and college QBs',
+        focuses:[
+          {id:'dropback',icon:'🦶',label:'Footwork & Drop'},
+          {id:'pocket',icon:'📍',label:'Pocket Presence'},
+          {id:'quickgame',icon:'⚡',label:'Quick Game'},
+          {id:'intermediate',icon:'🎯',label:'Intermediate Routes'},
+          {id:'deepball',icon:'🚀',label:'Deep Ball'},
+          {id:'readdef',icon:'👁️',label:'Reading Defense'},
+        ]
+      },
+      receiving:{
+        label:'Receiving', icon:'🙌',
+        persona:'elite wide receivers and pass-catching coach with professional football experience',
+        focuses:[
+          {id:'routes',icon:'🔄',label:'Route Running'},
+          {id:'release',icon:'⚡',label:'Release'},
+          {id:'hands',icon:'🙌',label:'Hands & Catching'},
+          {id:'yac',icon:'🏃',label:'YAC'},
+          {id:'rblocking',icon:'💪',label:'Blocking'},
+          {id:'bodycontrol',icon:'🎭',label:'Body Control'},
+        ]
+      },
+      oline:{
+        label:'O-Line', icon:'💪',
+        persona:'elite offensive line coach specializing in pass protection and run blocking at the professional level',
+        focuses:[
+          {id:'passprotect',icon:'🛡️',label:'Pass Protection'},
+          {id:'runblock',icon:'💪',label:'Run Blocking'},
+          {id:'olfoot',icon:'🦶',label:'Footwork'},
+          {id:'handtech',icon:'✋',label:'Hand Technique'},
+          {id:'comms',icon:'📣',label:'Communication'},
+          {id:'puller',icon:'🔄',label:'Pull & Trap'},
+        ]
+      },
+      fdefense:{
+        label:'Defense', icon:'🛡️',
+        persona:'elite defensive football coach specializing in tackling, coverage, and pass rush',
+        focuses:[
+          {id:'tackling',icon:'💥',label:'Tackling'},
+          {id:'coverage',icon:'📍',label:'Coverage'},
+          {id:'passrush',icon:'🚀',label:'Pass Rush'},
+          {id:'gapdis',icon:'🔄',label:'Gap Discipline'},
+          {id:'runforce',icon:'💪',label:'Run Force'},
+          {id:'film',icon:'🎬',label:'Film Study'},
+        ]
+      },
+      rb:{
+        label:'Running Back', icon:'🏃',
+        persona:'elite running back coach who has trained professional and college ball carriers',
+        focuses:[
+          {id:'ballsec',icon:'🏈',label:'Ball Security'},
+          {id:'cuts',icon:'⚡',label:'Cuts & Vision'},
+          {id:'rbprotect',icon:'🛡️',label:'Pass Protection'},
+          {id:'rbroutes',icon:'🔄',label:'Route Running'},
+          {id:'shortyards',icon:'💪',label:'Short Yardage'},
+          {id:'rbreceiving',icon:'🙌',label:'Receiving'},
+        ]
+      }
+    }
+  }
+};
+
+function getMods() { return ALL_SPORTS[currentSport].mods; }
+
+// ═══════════════════════════════════════════
+// ANIMATIONS — CSS stick-figure per drill concept
+// Returns HTML string for anim-box
+// ═══════════════════════════════════════════
+const ANIM_MAP = {
+  // Key exercise concepts → animated SVG/CSS
+  'tee': `
+    <div class="anim-grid"></div>
+    <!-- tee -->
+    <div class="sf sf-tee" style="left:50%;top:40%;width:3px;height:45px;transform:translateX(-50%)"></div>
+    <!-- ball on tee -->
+    <div class="sf sf-ball" style="left:calc(50% - 5px);top:32%;animation:glowPulse 1.8s ease-in-out infinite"></div>
+    <!-- batter body -->
+    <div class="sf sf-head" style="left:calc(35% - 9px);top:15%;animation:stanceRock 1.6s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:35%;top:33%;height:28px;animation:stanceRock 1.6s ease-in-out infinite"></div>
+    <!-- bat swinging -->
+    <div class="sf sf-bat" style="left:calc(35% - 1px);top:38%;height:22px;width:3px;animation:teeContact 1.6s ease-in-out infinite;transform-origin:top center"></div>
+    <div class="anim-label">TEE DRILL</div>
+  `,
+  'hip': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:10%"></div>
+    <div class="sf sf-body" style="left:50%;top:28%;height:30px"></div>
+    <!-- hips rotating -->
+    <div style="position:absolute;left:calc(50% - 16px);top:42%;width:32px;height:18px;border:2px solid var(--gold);border-radius:50%;animation:hipTurn 1.2s ease-in-out infinite alternate;transform-origin:center center"></div>
+    <div class="sf sf-leg" style="left:43%;top:52%;height:26px;animation:sprintLeg 1.2s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:57%;top:52%;height:26px;animation:sprintLeg 1.2s ease-in-out infinite;animation-delay:0.6s"></div>
+    <div class="anim-label">HIP ROTATION DRILL</div>
+  `,
+  'load': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:10%;animation:loadCoil 1.8s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:50%;top:28%;height:28px;animation:loadCoil 1.8s ease-in-out infinite"></div>
+    <div class="sf sf-arm" style="left:50%;top:32%;height:18px;animation:loadCoil 1.8s ease-in-out infinite;transform-origin:top center"></div>
+    <div class="sf sf-leg" style="left:43%;top:56%;height:24px;animation:leadStep 1.8s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:57%;top:56%;height:24px"></div>
+    <!-- weight shift indicator -->
+    <div style="position:absolute;left:25%;top:55%;width:20px;height:3px;background:var(--gold);border-radius:2px;opacity:0.5;animation:weightShift 1.8s ease-in-out infinite"></div>
+    <div class="anim-label">LOAD & STRIDE</div>
+  `,
+  'glove': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:10%;animation:catcherSquat 1.4s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:50%;top:28%;height:22px;animation:catcherSquat 1.4s ease-in-out infinite"></div>
+    <!-- glove -->
+    <div class="sf sf-glove" style="right:25%;top:35%;animation:gloveOpen 1.4s ease-in-out infinite"></div>
+    <!-- incoming ball -->
+    <div class="sf sf-ball" style="right:15%;top:37%;animation:ballTrack 1.4s linear infinite"></div>
+    <div class="anim-label">RECEIVING DRILL</div>
+  `,
+  'squat': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:8%;animation:catcherSquat 1.6s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:50%;top:25%;height:20px;animation:catcherSquat 1.6s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:38%;top:44%;height:20px;animation:kneesBend 1.6s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:62%;top:44%;height:20px;animation:kneesBend 1.6s ease-in-out infinite;animation-delay:0.05s"></div>
+    <!-- knee pad indicators -->
+    <div style="position:absolute;left:35%;top:62%;width:10px;height:10px;border-radius:50%;border:1px solid var(--blue);animation:kneesBend 1.6s ease-in-out infinite"></div>
+    <div style="position:absolute;left:59%;top:62%;width:10px;height:10px;border-radius:50%;border:1px solid var(--blue);animation:kneesBend 1.6s ease-in-out infinite;animation-delay:0.05s"></div>
+    <div class="anim-label">BLOCKING STANCE</div>
+  `,
+  'throw': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(40% - 9px);top:10%"></div>
+    <div class="sf sf-body" style="left:40%;top:28%;height:28px"></div>
+    <!-- throwing arm -->
+    <div class="sf sf-arm" style="left:40%;top:28%;height:22px;animation:throwArm 1.3s ease-in-out infinite;transform-origin:top center"></div>
+    <!-- ball release -->
+    <div class="sf sf-ball" style="left:42%;top:28%;animation:ballRelease 1.3s ease-out infinite"></div>
+    <div class="sf sf-leg" style="left:34%;top:56%;height:24px;animation:sprintLeg 1.3s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:46%;top:56%;height:24px;animation:sprintLeg 1.3s ease-in-out infinite;animation-delay:0.65s"></div>
+    <div class="anim-label">THROWING MECHANICS</div>
+  `,
+  'sprint': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(35% - 9px);top:12%;animation:sprintLeg 0.5s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:35%;top:29%;height:26px;transform:rotate(-8deg)"></div>
+    <div class="sf sf-arm" style="left:35%;top:30%;height:17px;animation:sprintArm 0.5s ease-in-out infinite;transform-origin:top center"></div>
+    <div class="sf sf-arm" style="left:35%;top:30%;height:17px;animation:sprintArm 0.5s ease-in-out infinite;animation-delay:0.25s;transform-origin:top center;opacity:0.5"></div>
+    <div class="sf sf-leg" style="left:29%;top:54%;height:22px;animation:sprintLeg 0.5s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:41%;top:54%;height:22px;animation:sprintLeg 0.5s ease-in-out infinite;animation-delay:0.25s"></div>
+    <!-- speed lines -->
+    <div style="position:absolute;right:15%;top:35%;display:flex;flex-direction:column;gap:5px">
+      <div style="width:20px;height:2px;background:var(--gold);border-radius:1px;opacity:0.5;animation:glowPulse 0.5s ease-in-out infinite"></div>
+      <div style="width:14px;height:2px;background:var(--gold);border-radius:1px;opacity:0.3;animation:glowPulse 0.5s ease-in-out infinite;animation-delay:0.15s"></div>
+    </div>
+    <div class="anim-label">SPRINT MECHANICS</div>
+  `,
+  'slide': `
+    <div class="anim-grid"></div>
+    <!-- base -->
+    <div class="sf sf-base" style="right:12%;top:55%"></div>
+    <!-- player sliding -->
+    <div style="position:absolute;left:15%;top:45%;animation:slideIn 2s ease-out infinite">
+      <div class="sf sf-head" style="position:relative;top:0;left:0;width:16px;height:16px;border-radius:50%;border:2px solid var(--gold)"></div>
+      <div class="sf sf-body" style="position:relative;top:-4px;left:7px;width:2px;height:20px;background:var(--gold);transform:rotate(80deg);transform-origin:top center"></div>
+    </div>
+    <div class="anim-label">SLIDE TECHNIQUE</div>
+  `,
+  'backhand': `
+    <div class="anim-grid"></div>
+    <!-- fielder -->
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:12%"></div>
+    <div class="sf sf-body" style="left:50%;top:29%;height:24px;animation:fieldBackhand 1.8s ease-in-out infinite"></div>
+    <!-- glove on backhand -->
+    <div class="sf sf-glove" style="left:28%;top:40%;animation:fieldBackhand 1.8s ease-in-out infinite;transform-origin:center center"></div>
+    <!-- ball coming at backhand -->
+    <div class="sf sf-ball" style="left:70%;top:52%;animation:ballTrack 1.8s linear infinite;animation-direction:reverse"></div>
+    <div class="anim-label">BACKHAND TECHNIQUE</div>
+  `,
+  'transfer': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:10%"></div>
+    <div class="sf sf-body" style="left:50%;top:27%;height:26px"></div>
+    <!-- glove receiving -->
+    <div class="sf sf-glove" style="left:28%;top:35%;animation:transferSnap 1.2s ease-in-out infinite"></div>
+    <!-- ball transfer snap -->
+    <div class="sf sf-ball" style="left:35%;top:38%;animation:transferSnap 1.2s ease-in-out infinite;animation-delay:0.15s"></div>
+    <!-- throwing hand -->
+    <div class="sf sf-arm" style="left:50%;top:30%;height:18px;animation:throwArm 1.2s ease-in-out infinite;transform-origin:top center"></div>
+    <div class="anim-label">CATCH & TRANSFER</div>
+  `,
+  'frame': `
+    <div class="anim-grid"></div>
+    <!-- catcher low in stance -->
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:15%;animation:catcherSquat 2s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:50%;top:32%;height:18px;animation:catcherSquat 2s ease-in-out infinite"></div>
+    <!-- glove framing zone -->
+    <div style="position:absolute;right:18%;top:30%;width:28px;height:28px;border-radius:50%;border:2px dashed rgba(245,166,35,0.5);animation:frameZone 2s ease-in-out infinite"></div>
+    <div class="sf sf-glove" style="right:20%;top:35%;animation:gloveOpen 2s ease-in-out infinite"></div>
+    <!-- strike zone box indicator -->
+    <div style="position:absolute;right:10%;top:28%;width:20px;height:24px;border:1px solid rgba(255,255,255,0.2);border-radius:2px"></div>
+    <div class="anim-label">PITCH FRAMING</div>
+  `,
+  'default': `
+    <div class="anim-grid"></div>
+    <div class="sf sf-head" style="left:calc(50% - 9px);top:12%;animation:stanceRock 2s ease-in-out infinite"></div>
+    <div class="sf sf-body" style="left:50%;top:29%;height:28px"></div>
+    <div class="sf sf-arm" style="left:50%;top:31%;height:18px;animation:armSwing 2s ease-in-out infinite;transform-origin:top center"></div>
+    <div class="sf sf-arm" style="left:50%;top:31%;height:18px;animation:armSwing 2s ease-in-out infinite;animation-delay:1s;transform-origin:top center;opacity:0.5"></div>
+    <div class="sf sf-leg" style="left:43%;top:57%;height:22px;animation:sprintLeg 2s ease-in-out infinite"></div>
+    <div class="sf sf-leg" style="left:57%;top:57%;height:22px;animation:sprintLeg 2s ease-in-out infinite;animation-delay:1s"></div>
+    <div class="anim-label">TECHNIQUE DRILL</div>
+  `
+};
+
+function getAnim(concept) {
+  const c = concept.toLowerCase();
+  if (c.includes('tee') || c.includes('contact')) return ANIM_MAP.tee;
+  if (c.includes('hip') || c.includes('rotat')) return ANIM_MAP.hip;
+  if (c.includes('load') || c.includes('coil') || c.includes('stride')) return ANIM_MAP.load;
+  if (c.includes('receiv') || c.includes('glove') || c.includes('soft hand')) return ANIM_MAP.glove;
+  if (c.includes('block') || c.includes('squat') || c.includes('stance')) return ANIM_MAP.squat;
+  if (c.includes('throw') || c.includes('arm action') || c.includes('release') || c.includes('velocity')) return ANIM_MAP.throw;
+  if (c.includes('sprint') || c.includes('speed') || c.includes('first step')) return ANIM_MAP.sprint;
+  if (c.includes('slide') || c.includes('sliding')) return ANIM_MAP.slide;
+  if (c.includes('backhand')) return ANIM_MAP.backhand;
+  if (c.includes('transfer') || c.includes('quick hands')) return ANIM_MAP.transfer;
+  if (c.includes('fram')) return ANIM_MAP.frame;
+  return ANIM_MAP.default;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+function init() {
+  if (!getMods()[currentMod]) currentMod = Object.keys(getMods())[0];
+  updateKeyBtn();
+  updatePlayerBtn();
+  updateProviderUI();
+  renderSportStrip();
+  renderModuleStrip();
+  renderFocuses();
+  renderDrillStats();
+  renderDrillFilter();
+  renderDrillTypeOptions();
+  renderDrillList();
+  renderFieldPage();
+  renderPlayerPositionOptions();
+  document.getElementById('drillDate').value = new Date().toISOString().split('T')[0];
+  renderQuickQs();
+  updateSportAccent();
+  updateCoachWelcome();
+  updateProBadge();
+  renderUsageMeter();
+  document.getElementById('sportStrip').style.display = 'flex';
+  document.getElementById('moduleStrip').style.display = 'flex';
+  const savedProviderKey = localStorage.getItem('dc_api_' + currentProvider);
+  if (savedProviderKey && !apiKey) { apiKey = savedProviderKey; updateKeyBtn(); }
+  // Silently verify Pro status against backend (non-blocking)
+  setTimeout(verifyProOnLaunch, 3000);
+}
+
+// ═══════════════════════════════════════════
+// SPORT SWITCHING
+// ═══════════════════════════════════════════
+function setSport(sport) {
+  if (!isPro && sport !== 'baseball') {
+    openProModal('sport');
+    showToast('Upgrade to Pro to unlock all sports 🔒', 'error');
+    return;
+  }
+  currentSport = sport;
+  localStorage.setItem('dc_sport', sport);
+  currentMod = Object.keys(getMods())[0];
+  localStorage.setItem('dc_mod', currentMod);
+  selectedFocuses = [];
+  renderSportStrip();
+  renderModuleStrip();
+  renderFocuses();
+  renderDrillTypeOptions();
+  renderFieldPage();
+  renderPlayerPositionOptions();
+  updateSportAccent();
+  updateCoachWelcome();
+  renderQuickQs();
+  document.getElementById('resultsSection').style.display = 'none';
+}
+
+function updateSportAccent() {
+  document.getElementById('sportIcon').textContent = ALL_SPORTS[currentSport].icon;
+}
+
+function renderSportStrip() {
+  document.getElementById('sportStrip').innerHTML = Object.entries(ALL_SPORTS).map(([key, sp]) => {
+    const locked = !isPro && key !== 'baseball';
+    return `<button class="sport-chip${currentSport === key ? ' active' : ''}${locked ? ' locked' : ''}" data-sport="${key}" onclick="setSport('${key}')">${sp.icon} ${sp.name}</button>`;
+  }).join('');
+}
+
+function renderModuleStrip() {
+  document.getElementById('moduleStrip').innerHTML = Object.entries(getMods()).map(([key, mod]) =>
+    `<button class="mod-chip${currentMod === key ? ' active' : ''}" onclick="setMod('${key}')" id="mchip-${key}">${mod.icon} ${mod.label}</button>`
+  ).join('');
+}
+
+function renderDrillTypeOptions() {
+  const sel = document.getElementById('drillType');
+  if (!sel) return;
+  sel.innerHTML = ALL_SPORTS[currentSport].drillTypes.map(t => `<option>${t}</option>`).join('');
+}
+
+function renderFieldPage() {
+  const sp = ALL_SPORTS[currentSport];
+  const wrap = document.getElementById('fieldWrap');
+  if (!wrap) return;
+  const dots = sp.positions.map(p =>
+    `<button class="pos-dot" style="left:${p.x};top:${p.y}" onclick="loadPosCoach('${p.id}','${p.label}')" id="pd-${p.id}">${p.id}</button>`
+  ).join('');
+  wrap.innerHTML = `<svg class="field-svg" viewBox="0 0 300 300">${sp.fieldSVG}</svg>${dots}`;
+  document.getElementById('posCoachArea').innerHTML =
+    `<div class="empty"><div class="e-icon">⬆️</div><p>${sp.fieldEmptyMsg}</p></div>`;
+}
+
+function renderPlayerPositionOptions() {
+  const sel = document.getElementById('pPosition');
+  if (!sel) return;
+  const positions = ALL_SPORTS[currentSport].playerPositions;
+  sel.innerHTML = positions.map(p => `<option>${p}</option>`).join('');
+}
+
+function updateCoachWelcome() {
+  const sp = ALL_SPORTS[currentSport];
+  const el = document.getElementById('coachWelcome');
+  if (el) el.innerHTML = `<strong>Coach here.</strong> ${sp.coachIntro}`;
+  const av = document.getElementById('coachAvatar');
+  if (av) av.textContent = sp.icon;
+}
+
+// ═══════════════════════════════════════════
+// MODULE SWITCHING
+// ═══════════════════════════════════════════
+function setMod(mod) {
+  currentMod = mod;
+  localStorage.setItem('dc_mod', mod);
+  selectedFocuses = [];
+  document.querySelectorAll('.mod-chip').forEach(b => b.classList.remove('active'));
+  const chip = document.getElementById('mchip-' + mod);
+  if (chip) chip.classList.add('active');
+  renderFocuses();
+  document.getElementById('resultsSection').style.display = 'none';
+}
+
+function renderFocuses() {
+  const cfg = getMods()[currentMod];
+  if (!cfg) return;
+  document.getElementById('focusGrid').innerHTML = cfg.focuses.map(f => `
+    <button class="focus-pill" id="fp-${f.id}" onclick="toggleFocus('${f.id}')">
+      <span class="fi">${f.icon}</span>${f.label}
+    </button>
+  `).join('');
+}
+
+function toggleFocus(id) {
+  const btn = document.getElementById('fp-' + id);
+  if (selectedFocuses.includes(id)) {
+    selectedFocuses = selectedFocuses.filter(x => x !== id);
+    btn.classList.remove('on');
+  } else {
+    selectedFocuses.push(id);
+    btn.classList.add('on');
+  }
+}
+
+// ═══════════════════════════════════════════
+// VIDEO
+// ═══════════════════════════════════════════
+function handleVideo(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  videoFile = f;
+  const player = document.getElementById('videoPlayer');
+  if (player.src) URL.revokeObjectURL(player.src);
+  player.src = URL.createObjectURL(f);
+  document.getElementById('videoWrap').style.display     = 'block';
+  document.getElementById('videoControls').style.display = 'flex';
+  document.getElementById('uploadZone').style.display    = 'none';
+}
+
+// ═══════════════════════════════════════════
+// SAFE JSON PARSER
+// ═══════════════════════════════════════════
+function safeParseJSON(text) {
+  // 1. Try direct parse first (ideal path)
+  try { return JSON.parse(text); } catch(_) {}
+
+  // 2. Extract the outermost {...} block — handles preamble/postamble text
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) {
+    try { return JSON.parse(match[0]); } catch(_) {}
+
+    // 3. Try to fix truncated JSON by closing any open arrays/objects
+    let fixed = match[0];
+    const opens = (fixed.match(/\[/g)||[]).length - (fixed.match(/\]/g)||[]).length;
+    const braces = (fixed.match(/\{/g)||[]).length - (fixed.match(/\}/g)||[]).length;
+    // Remove trailing incomplete line then close structures
+    fixed = fixed.replace(/,\s*$/, '').replace(/[^}\]]*$/, '');
+    for (let i = 0; i < opens; i++) fixed += ']';
+    for (let i = 0; i < braces; i++) fixed += '}';
+    try { return JSON.parse(fixed); } catch(_) {}
+  }
+
+  throw new Error('Could not parse API response as JSON. The model may have returned unexpected text. Try again.');
+}
+
+// ═══════════════════════════════════════════
+// ANALYSIS
+// ═══════════════════════════════════════════
+async function runAnalysis() {
+  if (!apiKey) { openModal(); return; }
+  if (!canUse('analyses')) {
+    openProModal('analyses');
+    showToast('Daily limit reached — upgrade to Pro for unlimited analyses', 'error');
+    return;
+  }
+  bumpUsage('analyses');
+  const cfg = getMods()[currentMod];
+  const focusLabels = selectedFocuses.length > 0
+    ? selectedFocuses.map(id => cfg.focuses.find(f => f.id === id)?.label).filter(Boolean).join(', ')
+    : cfg.focuses.map(f => f.label).join(', ');
+
+  const btn = document.getElementById('analyzeBtn');
+  const bar = document.getElementById('loadingBar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-sm"></div>&nbsp; ANALYZING...';
+  bar.classList.add('show');
+  document.getElementById('resultsSection').style.display = 'none';
+
+  const pl = currentPlayer();
+  const playerCtx = pl ? `\nPlayer: ${pl.name}${pl.age ? ', Age ' + pl.age : ''}, ${pl.position}, ${pl.level}, Bats ${pl.bats}, Throws ${pl.throws}${pl.notes ? '. Coach notes: ' + pl.notes : ''}.` : '';
+
+  const systemPrompt = `You are a ${cfg.persona}. You give detailed, structured coaching analysis with actionable correction plans.${playerCtx}
+
+CRITICAL FORMAT — You MUST respond with valid JSON only. No markdown, no preamble.
+
+{
+  "summary": "2-3 sentence overall assessment",
+  "grades": [
+    {
+      "area": "Area Name",
+      "grade": "A|B|C|D",
+      "issue": "One sentence describing the main problem (for B/C/D grades)",
+      "exercises": [
+        {
+          "name": "Exercise Name",
+          "concept": "tee|hip|load|glove|squat|throw|sprint|slide|backhand|transfer|frame",
+          "sets": "3 sets",
+          "reps": "10 reps",
+          "duration": "",
+          "steps": [
+            "Step 1 description with specific body positioning cues",
+            "Step 2 description",
+            "Step 3 description",
+            "Step 4 - what to feel/check",
+            "Step 5 - common error to avoid"
+          ],
+          "keyFocus": "The single most important thing to think about",
+          "expectedResults": "What specifically improves and in what timeframe (e.g., '2-3 weeks of daily reps: you will see hip-to-shoulder separation increase, driving 15-20% more exit velocity')"
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Include ALL focus areas in grades array
+- A grade = brief positive reinforcement + 1 maintenance drill
+- B/C/D grades = 2-3 exercises with full step-by-step detail
+- Steps must be specific coaching cues, NOT generic advice
+- expectedResults must be measurable and time-bound
+- concept field must match the animation keywords listed
+- Return ONLY the JSON object`;
+
+  const userMsg = videoFile
+    ? `Analyze my ${cfg.label.toLowerCase()} video. Focus on: ${focusLabels}. Give me letter grades and a full correction plan for each area that needs work.`
+    : `Give me a complete ${cfg.label.toLowerCase()} analysis and correction plan for these areas: ${focusLabels}. Grade each area and give me step-by-step exercises for anything below an A.`;
+
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMsg }]
+    });
+    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+    const parsed = safeParseJSON(raw);
+    renderResults(parsed);
+  } catch(err) {
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('correctionPlans').innerHTML = `<div class="card" style="border-color:var(--red)"><p style="color:var(--red);font-size:14px">Error: ${err.message}</p></div>`;
+  }
+
+  bar.classList.remove('show');
+  btn.disabled = false;
+  btn.innerHTML = '⚡ ANALYZE NOW';
+}
+
+function gradeClass(g) {
+  return g === 'A' ? 'gA' : g === 'B' ? 'gB' : g === 'C' ? 'gC' : 'gD';
+}
+
+// ─── Analysis persistence helpers ───────────────────────────────────────────
+const GRADE_VAL = { A: 4, B: 3, C: 2, D: 1 };
+
+function saveAnalysis(data) {
+  const entry = {
+    id: 'a_' + Date.now(),
+    playerId:  currentPlayerId || null,
+    sport:     currentSport,
+    sportName: ALL_SPORTS[currentSport].name,
+    sportIcon: ALL_SPORTS[currentSport].icon,
+    mod:       currentMod,
+    modLabel:  getMods()[currentMod]?.label || currentMod,
+    date:      new Date().toISOString().split('T')[0],
+    ts:        Date.now(),
+    summary:   data.summary,
+    grades:    data.grades.map(g => ({ area: g.area, grade: g.grade })),
+    hasVideo:  !!videoFile,
+  };
+  analyses.push(entry);
+  if (analyses.length > 500) analyses = analyses.slice(-500);
+  localStorage.setItem('dc_analyses', JSON.stringify(analyses));
+  return entry;
+}
+
+function getPrevAnalysis(playerId, sport, mod, excludeId) {
+  return [...analyses]
+    .filter(a => a.playerId === (playerId || null) && a.sport === sport && a.mod === mod && a.id !== excludeId)
+    .sort((a, b) => b.ts - a.ts)[0] || null;
+}
+
+function computeDeltas(currentGrades, prev) {
+  if (!prev) return null;
+  return currentGrades.map(g => {
+    const p = prev.grades.find(x => x.area === g.area);
+    const delta = p ? (GRADE_VAL[g.grade] || 0) - (GRADE_VAL[p.grade] || 0) : 0;
+    return { ...g, prevGrade: p?.grade || null, delta };
+  });
+}
+
+function renderAnalysisHistoryPanel(excludeId) {
+  const el = document.getElementById('analysisHistoryPanel');
+  if (!el) return;
+  const history = [...analyses]
+    .filter(a => a.playerId === (currentPlayerId || null) && a.sport === currentSport && a.mod === currentMod && a.id !== excludeId)
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, 6);
+  if (!history.length) { el.style.display = 'none'; return; }
+  const playerLabel = currentPlayerId ? (' · ' + (currentPlayer()?.name || '')) : '';
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-label">📅 Session History${playerLabel}</div>
+      ${history.map(a => `
+        <div class="history-row">
+          <div class="history-date">${a.date}</div>
+          <div class="history-meta">${a.sportIcon} ${a.modLabel}${a.hasVideo ? ' 🎬' : ''}</div>
+          <div class="history-grades">${a.grades.map(g =>
+            `<span class="h-grade ${gradeClass(g.grade)}" title="${g.area}">${g.grade}</span>`
+          ).join('')}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ─── Main results renderer ───────────────────────────────────────────────────
+function renderResults(data) {
+  // Persist this analysis
+  const saved = saveAnalysis(data);
+  const prev  = getPrevAnalysis(currentPlayerId, currentSport, currentMod, saved.id);
+  const deltas = computeDeltas(data.grades, prev);
+
+  // Summary
+  document.getElementById('analysisSummary').innerHTML = `<p>${data.summary}</p>`;
+
+  // Grades strip — with delta arrows when history exists
+  const strip = document.getElementById('gradeStrip');
+  const compareLabel = prev
+    ? `<div class="compare-header">📊 vs. <strong>${prev.date}</strong> · tap a grade to see the fix plan</div>`
+    : `<div class="compare-header" style="color:var(--muted)">Tap a grade to jump to its correction plan</div>`;
+
+  strip.innerHTML = compareLabel + data.grades.map((g, i) => {
+    const d = deltas ? deltas[i] : null;
+    let deltaHTML = '';
+    if (d && d.prevGrade) {
+      if      (d.delta > 0) deltaHTML = `<span class="g-delta up">↑ was ${d.prevGrade}</span>`;
+      else if (d.delta < 0) deltaHTML = `<span class="g-delta down">↓ was ${d.prevGrade}</span>`;
+      else                  deltaHTML = `<span class="g-delta same">= ${d.prevGrade}</span>`;
+    } else {
+      const label = g.grade === 'A' ? 'Great' : g.grade === 'B' ? 'Good' : g.grade === 'C' ? 'Needs Work' : 'Fix Now';
+      deltaHTML = `<div class="g-label">${label}</div>`;
+    }
+    return `
+      <div class="g-chip" onclick="jumpToPlan(${i})">
+        <div class="g-area">${g.area}</div>
+        <div class="g-val ${gradeClass(g.grade)}">${g.grade}</div>
+        ${deltaHTML}
+      </div>`;
+  }).join('');
+
+  // Correction plans
+  document.getElementById('correctionPlans').innerHTML = data.grades.map((g, i) => buildPlan(g, i)).join('');
+
+  // History panel below plans
+  renderAnalysisHistoryPanel(saved.id);
+
+  document.getElementById('resultsSection').style.display = 'block';
+  setTimeout(() => document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+}
+
+function buildPlan(grade, idx) {
+  const gc = gradeClass(grade.grade);
+  const colorVar = grade.grade === 'A' ? 'var(--green)' : grade.grade === 'B' ? 'var(--gold)' : grade.grade === 'C' ? '#ff9800' : 'var(--red)';
+
+  const exercisesHTML = (grade.exercises || []).map((ex, ei) => buildExercise(ex, ei)).join('');
+
+  return `
+    <div id="plan-${idx}" style="margin-bottom:10px">
+      <div class="plan-header" onclick="togglePlan(${idx})" style="border-color:${colorVar};border-left:3px solid ${colorVar}">
+        <div class="g-val ${gc}" style="font-family:'Bebas Neue',sans-serif;font-size:24px;line-height:1">${grade.grade}</div>
+        <div class="plan-area-name">${grade.area}</div>
+        ${grade.issue ? `<div style="font-size:11px;color:var(--muted);max-width:120px;text-align:right;line-height:1.3">${grade.issue}</div>` : ''}
+        <div class="plan-toggle" id="ptoggle-${idx}">▼</div>
+      </div>
+      <div class="plan-body" id="pbody-${idx}">
+        ${exercisesHTML || `<div class="exercise-card"><p style="font-size:14px;color:var(--green)">✅ Looking solid here. Keep drilling and maintaining this skill.</p></div>`}
+      </div>
+    </div>
+  `;
+}
+
+function buildExercise(ex, num) {
+  const animHTML = getAnim(ex.concept || ex.name);
+  const metaHTML = [
+    ex.sets ? `<span class="ex-tag sets">${ex.sets}</span>` : '',
+    ex.reps ? `<span class="ex-tag reps">${ex.reps}</span>` : '',
+    ex.duration ? `<span class="ex-tag duration">${ex.duration}</span>` : '',
+  ].filter(Boolean).join('');
+
+  const stepsHTML = (ex.steps || []).map((s, si) => `
+    <div class="step-item ${si === 0 ? 'key' : ''}">
+      <div class="step-num">${si + 1}</div>
+      <div class="step-text">${s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="exercise-card">
+      <div class="ex-header">
+        <div class="ex-num">${num + 1}</div>
+        <div class="ex-name">${ex.name}</div>
+      </div>
+      ${metaHTML ? `<div class="ex-meta">${metaHTML}</div>` : ''}
+      
+      <!-- ANIMATION -->
+      <div class="anim-box">${animHTML}</div>
+      
+      <!-- STEPS -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Step-by-Step</div>
+      <div class="steps-list">${stepsHTML}</div>
+      
+      ${ex.keyFocus ? `
+        <div style="margin-top:10px;padding:9px 12px;background:var(--gold-dim);border-radius:8px;border:1px solid rgba(245,166,35,0.3)">
+          <div style="font-size:10px;font-weight:700;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px">🎯 Key Focus</div>
+          <div style="font-size:13px;color:var(--text)">${ex.keyFocus}</div>
+        </div>
+      ` : ''}
+      
+      ${ex.expectedResults ? `
+        <div class="results-box">
+          <div class="results-title">📈 Expected Results</div>
+          <div class="results-text">${ex.expectedResults}</div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function togglePlan(idx) {
+  const body = document.getElementById('pbody-' + idx);
+  const toggle = document.getElementById('ptoggle-' + idx);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function jumpToPlan(idx) {
+  const plan = document.getElementById('plan-' + idx);
+  if (plan) {
+    const body = document.getElementById('pbody-' + idx);
+    const toggle = document.getElementById('ptoggle-' + idx);
+    body.classList.add('open');
+    toggle.classList.add('open');
+    setTimeout(() => plan.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+}
+
+// ═══════════════════════════════════════════
+// DRILLS
+// ═══════════════════════════════════════════
+const TAG_CLASSES = ['dt-hit','dt-cat','dt-thr','dt-run','dt-fld'];
+function getTagClass(type) {
+  const sp = ALL_SPORTS[currentSport];
+  const idx = sp.drillTypes.indexOf(type);
+  return idx >= 0 ? TAG_CLASSES[idx % TAG_CLASSES.length] : 'dt-hit';
+}
+function getTypeIcon(type) {
+  for (const s of Object.values(ALL_SPORTS)) {
+    const idx = s.drillTypes.indexOf(type);
+    if (idx >= 0) {
+      const modKey = Object.keys(s.mods)[idx];
+      return modKey ? s.mods[modKey].icon : '🏅';
+    }
+  }
+  return '🏅';
+}
+
+function renderDrillStats() {
+  const total = drills.length;
+  const reps = drills.reduce((s,d) => s + (+d.reps||0), 0);
+  const areas = [...new Set(drills.map(d=>d.type))].length;
+  const avg = total > 0 ? Math.round(reps/total) : 0;
+  document.getElementById('drillStats').innerHTML = `
+    <div class="stat-tile"><div class="stat-num">${total}</div><div class="stat-lbl">Sessions Logged</div></div>
+    <div class="stat-tile"><div class="stat-num">${reps.toLocaleString()}</div><div class="stat-lbl">Total Reps</div></div>
+    <div class="stat-tile"><div class="stat-num">${areas}</div><div class="stat-lbl">Skill Areas</div></div>
+    <div class="stat-tile"><div class="stat-num">${avg}</div><div class="stat-lbl">Avg Reps/Session</div></div>
+  `;
+}
+
+function renderDrillFilter() {
+  const container = document.getElementById('drillFilterRow');
+  if (!container) return;
+  if (players.length === 0) { container.innerHTML = ''; return; }
+  const btns = [{ id: null, label: 'All Players' }, ...players.map(p => ({ id: p.id, label: p.name }))];
+  container.innerHTML = btns.map(b =>
+    `<button class="drill-filter-btn${drillFilter === b.id ? ' active' : ''}" onclick="setDrillFilter(${b.id ? `'${b.id}'` : 'null'})">${b.label}</button>`
+  ).join('');
+}
+
+function setDrillFilter(id) {
+  drillFilter = id;
+  renderDrillFilter();
+  renderDrillList();
+}
+
+function renderDrillList() {
+  const list = document.getElementById('drillList');
+  const filtered = drillFilter ? drills.filter(d => d.playerId === drillFilter) : drills;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="e-icon">📋</div><p>No drills yet.<br>Log your first session above.</p></div>';
+    return;
+  }
+  list.innerHTML = [...filtered].reverse().map((d) => {
+    const realIdx = drills.indexOf(d);
+    const pName = d.playerId ? (players.find(p => p.id === d.playerId)?.name || '') : '';
+    return `
+      <div class="drill-item">
+        <div class="drill-icon">${getTypeIcon(d.type)}</div>
+        <div class="drill-info">
+          <div class="drill-name">${d.name} <span class="drill-tag ${getTagClass(d.type)}">${d.type}</span>${pName ? `<span class="drill-player-tag">👤 ${pName}</span>` : ''}</div>
+          <div class="drill-meta">${d.date} · ${d.reps} reps</div>
+          ${d.notes ? `<div class="drill-note">${d.notes}</div>` : ''}
+        </div>
+        <button class="del-btn" onclick="deleteDrill(${realIdx})">🗑</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function addDrill() {
+  const name = document.getElementById('drillName').value.trim();
+  if (!name) { showToast('Enter a drill name', 'error'); return; }
+  drills.push({
+    name,
+    type: document.getElementById('drillType').value,
+    reps: document.getElementById('drillReps').value || '0',
+    date: document.getElementById('drillDate').value,
+    notes: document.getElementById('drillNotes').value.trim(),
+    playerId: currentPlayerId || null,
+  });
+  localStorage.setItem('dc_drills2', JSON.stringify(drills));
+  document.getElementById('drillName').value = '';
+  document.getElementById('drillReps').value = '';
+  document.getElementById('drillNotes').value = '';
+  renderDrillStats();
+  renderDrillList();
+}
+
+function deleteDrill(i) {
+  showConfirm('Delete this entry?', () => {
+    drills.splice(i, 1);
+    localStorage.setItem('dc_drills2', JSON.stringify(drills));
+    renderDrillStats();
+    renderDrillList();
+  });
+}
+
+// ═══════════════════════════════════════════
+// COACH CHAT
+// ═══════════════════════════════════════════
+const QUICK_QS_MAP = {
+  baseball: {
+    analyze: ['Fix my hip rotation','Too many grounders','More power','Improve pop time','Arm velocity drills'],
+    drills:  ['Build me a drill plan','Best tee drills','Catching drills','Arm strength routine'],
+    coach:   ['Fix my mechanics','Build practice plan','Mental tips for slumps','Pre-game routine'],
+    field:   ['Positioning tips','Footwork drills','Range reads','Backhand technique'],
+  },
+  hockey: {
+    analyze: ['Fix my skating stride','Improve shot accuracy','Better edge work','Stickhandling drills','Gap control tips'],
+    drills:  ['Power skating drills','Shooting workout','Puck handling routine','Goalie drill plan'],
+    coach:   ['Fix my mechanics','Build practice plan','Mental tips','Pre-game routine'],
+    field:   ['Position responsibilities','D-zone coverage','Power play tips','Penalty kill setup'],
+  },
+  basketball: {
+    analyze: ['Fix my shooting form','Ball handling drills','Defensive footwork','Post move techniques','Improve my crossover'],
+    drills:  ['Shooting workout','Ball handling routine','Defensive slides drill','Post moves plan'],
+    coach:   ['Fix my mechanics','Build practice plan','Mental tips for slumps','Pre-game routine'],
+    field:   ['Position responsibilities','Pick & roll defense','Offensive spacing','Fast break tips'],
+  },
+  football: {
+    analyze: ['Fix my QB footwork','Route running tips','Blocking technique','Tackling mechanics','Pass rush moves'],
+    drills:  ['QB throwing drills','Route tree workout','O-Line footwork drills','Pursuit angle drills'],
+    coach:   ['Fix my mechanics','Build practice plan','Mental tips for big games','Pre-game routine'],
+    field:   ['Position assignments','Coverage schemes','Blocking schemes','Red zone tips'],
+  },
+};
+
+function renderQuickQs() {
+  const sportQs = QUICK_QS_MAP[currentSport] || QUICK_QS_MAP.baseball;
+  const qs = sportQs[currentTab] || sportQs.coach;
+  document.getElementById('quickRow').innerHTML = qs.map(q =>
+    `<button class="qq" onclick="sendQuick('${q.replace(/'/g,"\\'")}'">${q}</button>`
+  ).join('');
+}
+
+function sendQuick(q) {
+  document.getElementById('chatInput').value = q;
+  sendMsg();
+}
+
+async function sendMsg() {
+  if (!apiKey) { openModal(); return; }
+  if (!canUse('chat')) {
+    openProModal('chat');
+    showToast('Daily message limit reached — upgrade to Pro for unlimited coaching', 'error');
+    return;
+  }
+  bumpUsage('chat');
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+
+  const msgs = document.getElementById('chatMessages');
+  const sendBtn = document.getElementById('sendBtn');
+
+  msgs.innerHTML += `<div class="msg user"><div class="m-avatar">👤</div><div class="m-bubble">${text}</div></div>`;
+  const tid = 'tid' + Date.now();
+  msgs.innerHTML += `<div class="msg assistant" id="${tid}"><div class="m-avatar">⚾</div><div class="m-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  sendBtn.disabled = true;
+  chatHistory.push({ role: 'user', content: text });
+
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+      system: `You are an ${ALL_SPORTS[currentSport].coachPersona}. You give specific, practical, step-by-step coaching advice. Use **bold** for key points. Be direct and results-focused. Never vague.`,
+      messages: chatHistory,
+    });
+    const reply = data.content[0].text;
+    chatHistory.push({ role: 'assistant', content: reply });
+    document.getElementById(tid).remove();
+    msgs.innerHTML += `<div class="msg assistant"><div class="m-avatar">⚾</div><div class="m-bubble">${reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div></div>`;
+  } catch(e) {
+    document.getElementById(tid).remove();
+    msgs.innerHTML += `<div class="msg assistant"><div class="m-avatar">⚾</div><div class="m-bubble" style="color:var(--red)">${e.message}</div></div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+  sendBtn.disabled = false;
+}
+
+// ═══════════════════════════════════════════
+// POSITION COACH
+// ═══════════════════════════════════════════
+async function loadPosCoach(posId, posName) {
+  document.querySelectorAll('.pos-dot').forEach(b => b.classList.remove('active'));
+  document.getElementById('pd-' + posId).classList.add('active');
+
+  const area = document.getElementById('posCoachArea');
+  area.innerHTML = `<div class="pos-tip"><div class="pos-tip-title">${ALL_SPORTS[currentSport].icon} ${posName}</div><div style="display:flex;align-items:center;gap:8px;color:var(--gold);font-size:14px"><div class="spinner-sm" style="border-top-color:var(--gold)"></div> Loading tips...</div></div>`;
+
+  if (!apiKey) { area.innerHTML = `<div class="pos-tip"><div class="pos-tip-title">${posName}</div><p style="font-size:13px;color:var(--muted)">Set your API key to get position coaching.</p></div>`; return; }
+
+  const sp = ALL_SPORTS[currentSport];
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+      system: sp.fieldPrompt,
+      messages: [{ role: 'user', content: sp.fieldQuestion(posName) }]
+    });
+    const text = data.content[0].text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    area.innerHTML = `<div class="pos-tip"><div class="pos-tip-title">📍 ${posName}</div><div class="pos-tip-body">${text}</div></div>`;
+  } catch(e) {
+    area.innerHTML = `<div class="pos-tip"><p style="color:var(--red);font-size:13px">${e.message}</p></div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+
+  // Nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + tab).classList.add('active');
+
+  // Strip visibility
+  document.getElementById('sportStrip').style.display = (tab === 'analyze' || tab === 'field') ? 'flex' : 'none';
+  document.getElementById('moduleStrip').style.display = tab === 'analyze' ? 'flex' : 'none';
+
+  // Pages
+  document.querySelectorAll('.page').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+
+  if (tab === 'coach') {
+    const p = document.getElementById('page-coach');
+    p.style.display = 'flex';
+    p.classList.add('active');
+  } else {
+    const p = document.getElementById('page-' + tab);
+    if (p) { p.style.display = 'block'; p.classList.add('active'); }
+  }
+  if (tab === 'players') renderPlayersPage();
+
+  renderQuickQs();
+
+  // Scroll top
+  document.getElementById('pageContent').scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════
+// API MODAL
+// ═══════════════════════════════════════════
+function openModal() {
+  document.querySelectorAll('.provider-tab').forEach(b => b.classList.toggle('active', b.dataset.p === currentProvider));
+  updateProviderUI();
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('apiTestResult').style.display = 'none';
+  document.getElementById('apiModal').classList.add('show');
+  setTimeout(() => document.getElementById('apiKeyInput').focus(), 300);
+}
+function closeModal() { document.getElementById('apiModal').classList.remove('show'); }
+
+function selectProvider(p) {
+  currentProvider = p;
+  document.querySelectorAll('.provider-tab').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+  updateProviderUI();
+  document.getElementById('apiTestResult').style.display = 'none';
+  // Load saved key for this provider if any
+  document.getElementById('apiKeyInput').value = localStorage.getItem('dc_api_' + p) || '';
+}
+
+function updateProviderUI() {
+  const cfg = PROVIDERS[currentProvider];
+  document.getElementById('apiKeyLabel').textContent = cfg.keyLabel;
+  document.getElementById('apiKeyInput').placeholder = cfg.placeholder;
+  document.getElementById('apiProviderHint').textContent = cfg.hint;
+}
+
+function saveApiKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if (!k) { showTestResult('error', 'Enter your key first.'); return; }
+  apiKey = k;
+  localStorage.setItem('dc_api', k);
+  localStorage.setItem('dc_api_' + currentProvider, k);
+  localStorage.setItem('dc_provider', currentProvider);
+  closeModal();
+  updateKeyBtn();
+  showToast('Connected — ' + PROVIDERS[currentProvider].name, 'success');
+}
+
+function updateKeyBtn() {
+  const btn = document.getElementById('keyBtn');
+  if (apiKey) { btn.textContent = '✅ Connected'; btn.className = 'key-btn connected'; }
+  else { btn.textContent = '🔑 Connect'; btn.className = 'key-btn'; }
+}
+
+function showTestResult(type, msg) {
+  const el = document.getElementById('apiTestResult');
+  el.style.display = 'block';
+  el.style.color = type === 'ok' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--gold)';
+  el.style.background = type === 'ok' ? 'rgba(0,200,83,0.08)' : type === 'error' ? 'rgba(229,57,53,0.08)' : 'rgba(245,166,35,0.08)';
+  el.style.padding = '10px 12px'; el.style.borderRadius = '8px';
+  el.textContent = msg;
+}
+
+async function testConnection() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if (!k) { showTestResult('error', '⚠️ Paste your key first.'); return; }
+  const testBtn = document.getElementById('testBtn');
+  testBtn.disabled = true; testBtn.textContent = 'Testing...';
+  showTestResult('warn', '⏳ Connecting to ' + PROVIDERS[currentProvider].name + '...');
+  const prevKey = apiKey; const prevProvider = currentProvider;
+  apiKey = k;
+  try {
+    const data = await callAI({ model: 'claude-sonnet-4-20250514', max_tokens: 20, messages: [{ role: 'user', content: 'Say OK' }] });
+    if (data.content && data.content[0]) {
+      localStorage.setItem('dc_api_' + currentProvider, k);
+      showTestResult('ok', '✅ Connected! Tap Save to activate.');
+    } else {
+      apiKey = prevKey;
+      showTestResult('error', '❌ Unexpected response.');
+    }
+  } catch(err) {
+    apiKey = prevKey;
+    const msg = err.message || '';
+    if (msg.includes('401') || msg.includes('invalid') || msg.includes('auth')) showTestResult('error', '❌ Invalid key — double-check and try again.');
+    else if (msg.includes('credit') || msg.includes('billing') || msg.includes('quota')) showTestResult('error', '❌ Billing issue — check your account.');
+    else if (msg.includes('subscription') || msg.includes('403')) showTestResult('error', '❌ Subscription not found — check your key.');
+    else showTestResult('error', '❌ ' + msg);
+  }
+  testBtn.disabled = false; testBtn.textContent = '🔌 Test';
+}
+
+document.getElementById('apiModal').addEventListener('click', e => { if (e.target.id === 'apiModal') closeModal(); });
+document.getElementById('playerModal').addEventListener('click', e => { if (e.target.id === 'playerModal') closePlayerModal(); });
+document.getElementById('proModal').addEventListener('click', e => { if (e.target.id === 'proModal') closeProModal(); });
+
+// ═══════════════════════════════════════════
+// PLAYER PROFILES
+// ═══════════════════════════════════════════
+function openPlayerModal() {
+  renderPlayerList();
+  showPlayerList();
+  document.getElementById('playerModal').classList.add('show');
+}
+function closePlayerModal() { document.getElementById('playerModal').classList.remove('show'); }
+function showPlayerList() {
+  document.getElementById('playerListView').style.display = 'block';
+  document.getElementById('playerFormView').style.display = 'none';
+}
+function showPlayerForm(editId = null) {
+  document.getElementById('playerListView').style.display = 'none';
+  document.getElementById('playerFormView').style.display = 'block';
+  document.getElementById('playerFormTitle').textContent = editId ? 'Edit Player' : 'Add Player';
+  document.getElementById('editingPlayerId').value = editId || '';
+  renderPlayerPositionOptions();
+  if (editId) {
+    const p = players.find(x => x.id === editId);
+    if (p) {
+      document.getElementById('pName').value = p.name || '';
+      // Try to set position; fall back to first option if not found
+      const posEl = document.getElementById('pPosition');
+      posEl.value = p.position || posEl.options[0]?.value || '';
+      document.getElementById('pLevel').value = p.level || 'High School';
+      document.getElementById('pBats').value = p.bats || 'Right';
+      document.getElementById('pThrows').value = p.throws || 'Right';
+      document.getElementById('pAge').value = p.age || '';
+      document.getElementById('pNotes').value = p.notes || '';
+    }
+  } else {
+    document.getElementById('pName').value = '';
+    document.getElementById('pAge').value = '';
+    document.getElementById('pNotes').value = '';
+    const posEl = document.getElementById('pPosition');
+    posEl.value = posEl.options[0]?.value || '';
+    document.getElementById('pLevel').value = 'High School';
+    document.getElementById('pBats').value = 'Right';
+    document.getElementById('pThrows').value = 'Right';
+  }
+}
+
+function savePlayer() {
+  const name = document.getElementById('pName').value.trim();
+  if (!name) { showToast('Enter a player name', 'error'); return; }
+  const editId = document.getElementById('editingPlayerId').value;
+  // Enforce free-tier player cap (adding new, not editing)
+  if (!editId && !isPro && players.length >= FREE_LIMITS.players) {
+    closePlayerModal();
+    openProModal('players');
+    showToast(`Free plan limited to ${FREE_LIMITS.players} players — upgrade to add more`, 'error');
+    return;
+  }
+  const data = {
+    name,
+    position: document.getElementById('pPosition').value,
+    level: document.getElementById('pLevel').value,
+    bats: document.getElementById('pBats').value,
+    throws: document.getElementById('pThrows').value,
+    age: document.getElementById('pAge').value,
+    notes: document.getElementById('pNotes').value.trim(),
+  };
+  if (editId) {
+    const idx = players.findIndex(p => p.id === editId);
+    if (idx >= 0) players[idx] = { ...players[idx], ...data };
+  } else {
+    players.push({ id: 'p_' + Date.now(), ...data, createdAt: Date.now() });
+  }
+  localStorage.setItem('dc_players', JSON.stringify(players));
+  renderPlayerList();
+  renderPlayersPage();
+  renderDrillFilter();
+  showPlayerList();
+  showToast(editId ? 'Player updated' : 'Player added ✅', 'success');
+}
+
+function selectPlayer(id) {
+  currentPlayerId = id;
+  localStorage.setItem('dc_current_player', id);
+  updatePlayerBtn();
+  closePlayerModal();
+  renderDrillFilter();
+  const p = players.find(x => x.id === id);
+  if (p) showToast('Now coaching: ' + p.name, 'success');
+}
+
+function deletePlayer(id) {
+  showConfirm('Delete this player and all their analysis history?', () => {
+    players = players.filter(p => p.id !== id);
+    if (currentPlayerId === id) { currentPlayerId = null; localStorage.removeItem('dc_current_player'); updatePlayerBtn(); }
+    localStorage.setItem('dc_players', JSON.stringify(players));
+    // Remove associated analyses and drills
+    analyses = analyses.filter(a => a.playerId !== id);
+    localStorage.setItem('dc_analyses', JSON.stringify(analyses));
+    drills = drills.filter(d => d.playerId !== id);
+    localStorage.setItem('dc_drills2', JSON.stringify(drills));
+    renderPlayerList();
+    renderPlayersPage();
+    renderDrillFilter();
+    renderDrillStats();
+    renderDrillList();
+  });
+}
+
+function updatePlayerBtn() {
+  const btn = document.getElementById('playerBtn');
+  const p = currentPlayer();
+  btn.textContent = p ? '👤 ' + (p.name.length > 11 ? p.name.slice(0,11) + '…' : p.name) : '👤 Player';
+  btn.className = p ? 'player-btn connected' : 'player-btn';
+}
+
+function renderPlayerList() {
+  const el = document.getElementById('playerList');
+  if (!players.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:14px">No players yet.<br>Tap <strong style="color:var(--gold)">+ Add Player</strong> to get started.</div>';
+    return;
+  }
+  el.innerHTML = players.map(p => {
+    const isActive = p.id === currentPlayerId;
+    return `<div class="player-card${isActive ? ' active-player' : ''}" onclick="selectPlayer('${p.id}')">
+      <div class="player-card-info">
+        <div class="player-card-name">${p.name}${isActive ? ' <span class="active-badge">Active</span>' : ''}</div>
+        <div class="player-card-meta">${p.position} · ${p.level}${p.age ? ' · Age ' + p.age : ''} · Bats ${p.bats[0]}/Throws ${p.throws[0]}</div>
+        ${p.notes ? `<div class="player-card-notes">${p.notes}</div>` : ''}
+      </div>
+      <div class="player-card-actions" onclick="event.stopPropagation()">
+        <button class="icon-btn" onclick="showPlayerForm('${p.id}')">✏️</button>
+        <button class="icon-btn" onclick="deletePlayer('${p.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function playerProgressHTML(playerId) {
+  const playerAnalyses = [...analyses]
+    .filter(a => a.playerId === playerId)
+    .sort((a, b) => b.ts - a.ts);
+  if (!playerAnalyses.length) return '';
+
+  // Group by sport+mod, take the most recent per group
+  const grouped = {};
+  for (const a of playerAnalyses) {
+    const key = a.sport + '|' + a.mod;
+    if (!grouped[key]) grouped[key] = a;
+  }
+  const recent = Object.values(grouped).slice(0, 3); // Show up to 3 mod groups
+
+  // Overall trend: compare newest vs oldest analysis (if ≥2 exist)
+  let trendHTML = '';
+  if (playerAnalyses.length >= 2) {
+    const newest = playerAnalyses[0];
+    const oldest = playerAnalyses[playerAnalyses.length - 1];
+    let improved = 0, declined = 0;
+    newest.grades.forEach(ng => {
+      const og = oldest.grades.find(x => x.area === ng.area && oldest.mod === newest.mod && oldest.sport === newest.sport);
+      if (og) {
+        const delta = (GRADE_VAL[ng.grade] || 0) - (GRADE_VAL[og.grade] || 0);
+        if (delta > 0) improved++;
+        else if (delta < 0) declined++;
+      }
+    });
+    if (improved > 0)
+      trendHTML = `<span class="trend-pill up">↑ ${improved} area${improved>1?'s':''} improved</span>`;
+    else if (declined > 0)
+      trendHTML = `<span class="trend-pill down">↓ ${declined} area${declined>1?'s':''} declined</span>`;
+    else if (playerAnalyses.length > 1)
+      trendHTML = `<span class="trend-pill flat">— consistent</span>`;
+  }
+
+  const rows = recent.map(a => `
+    <div class="player-analysis-row">
+      <div class="pa-label">${a.sportIcon} ${a.modLabel} · <span style="color:var(--muted)">${a.date}</span></div>
+      <div class="pa-grades">${a.grades.map(g =>
+        `<span class="h-grade ${gradeClass(g.grade)}" title="${g.area}">${g.grade}</span>`
+      ).join('')}</div>
+    </div>`).join('');
+
+  return `
+    <div class="player-progress">
+      <div class="player-progress-title">📊 ${playerAnalyses.length} Analysis Session${playerAnalyses.length>1?'s':''} ${trendHTML}</div>
+      ${rows}
+    </div>`;
+}
+
+function renderPlayersPage() {
+  const el = document.getElementById('playersPageList');
+  if (!el) return;
+  if (!players.length) {
+    el.innerHTML = '<div class="empty"><div class="e-icon">👤</div><p>No players yet.<br>Tap + Add to create your first player profile.</p></div>';
+    return;
+  }
+  el.innerHTML = players.map(p => {
+    const isActive = p.id === currentPlayerId;
+    const playerDrills = drills.filter(d => d.playerId === p.id);
+    const totalReps = playerDrills.reduce((s,d) => s + (+d.reps||0), 0);
+    return `
+    <div class="player-card${isActive ? ' active-player' : ''}" onclick="selectPlayer('${p.id}');switchTab('analyze')" style="flex-direction:column;align-items:stretch;gap:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:42px;height:42px;border-radius:50%;background:var(--surface3);border:2px solid ${isActive ? 'var(--blue)' : 'var(--border2)'};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>
+        <div class="player-card-info" style="flex:1">
+          <div class="player-card-name">${p.name}${isActive ? ' <span class="active-badge">Active</span>' : ''}</div>
+          <div class="player-card-meta">${p.position} · ${p.level}${p.age ? ' · Age ' + p.age : ''}</div>
+          <div class="player-card-meta" style="margin-top:2px">🏋️ ${playerDrills.length} drill sessions · ${totalReps.toLocaleString()} reps</div>
+          ${p.notes ? `<div class="player-card-notes">${p.notes}</div>` : ''}
+        </div>
+        <div class="player-card-actions" onclick="event.stopPropagation()">
+          <button class="icon-btn" onclick="openPlayerModal();showPlayerForm('${p.id}')">✏️</button>
+          <button class="icon-btn" onclick="deletePlayer('${p.id}')">🗑</button>
+        </div>
+      </div>
+      ${playerProgressHTML(p.id)}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// TOAST (replaces alert())
+// ═══════════════════════════════════════════
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = 'dc-toast dc-toast-' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('dc-toast-show'));
+  setTimeout(() => { t.classList.remove('dc-toast-show'); setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+// ═══════════════════════════════════════════
+// CONFIRM MODAL (replaces confirm())
+// ═══════════════════════════════════════════
+function showConfirm(msg, onYes) {
+  document.getElementById('confirmMsg').textContent = msg;
+  const modal = document.getElementById('confirmModal');
+  modal.classList.add('show');
+  document.getElementById('confirmYes').onclick = () => { modal.classList.remove('show'); onYes(); };
+  document.getElementById('confirmNo').onclick = () => modal.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════
+// VIDEO — REMOVE / REPLACE
+// ═══════════════════════════════════════════
+function removeVideo() {
+  videoFile = null;
+  const player = document.getElementById('videoPlayer');
+  if (player.src) { URL.revokeObjectURL(player.src); player.src = ''; }
+  document.getElementById('videoWrap').style.display    = 'none';
+  document.getElementById('videoControls').style.display = 'none';
+  document.getElementById('uploadZone').style.display    = 'block';
+}
+
+// ═══════════════════════════════════════════
+// USAGE TRACKING
+// ═══════════════════════════════════════════
+function todayKey() { return 'dc_usage_' + new Date().toISOString().split('T')[0]; }
+
+function getUsage() {
+  try { return JSON.parse(localStorage.getItem(todayKey()) || '{}'); } catch(_) { return {}; }
+}
+
+function bumpUsage(type) {
+  const u = getUsage();
+  u[type] = (u[type] || 0) + 1;
+  localStorage.setItem(todayKey(), JSON.stringify(u));
+  renderUsageMeter();
+  return u[type];
+}
+
+function canUse(type) {
+  if (isPro) return true;
+  const u = getUsage();
+  return (u[type] || 0) < FREE_LIMITS[type];
+}
+
+function renderUsageMeter() {
+  const el = document.getElementById('usageMeter');
+  if (!el) return;
+  if (isPro) { el.style.display = 'none'; return; }
+  const u = getUsage();
+  const used = u.analyses || 0;
+  const max  = FREE_LIMITS.analyses;
+  const pips = Array.from({length: max}, (_, i) =>
+    `<div class="usage-pip${i < used ? ' used' : ''}"></div>`
+  ).join('');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="usage-bar-wrap">
+      <div class="usage-label"><strong>${used}/${max}</strong> free analyses today</div>
+      <div class="usage-pips">${pips}</div>
+      <span class="usage-upgrade-link" onclick="openProModal()">Go Pro →</span>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// SUBSCRIPTION / PRO
+// ═══════════════════════════════════════════
+function openProModal(reason) {
+  // Show/hide the active-pro panel vs activation form
+  if (isPro) {
+    document.getElementById('proActivateWrap').style.display  = 'none';
+    document.getElementById('proManageWrap').style.display    = 'flex';
+    document.getElementById('proManageKey').textContent = 'Key: ' + proKey;
+  } else {
+    document.getElementById('proActivateWrap').style.display  = 'block';
+    document.getElementById('proManageWrap').style.display    = 'none';
+    document.getElementById('proKeyResult').style.display     = 'none';
+    document.getElementById('proKeyInput').value              = '';
+  }
+  document.getElementById('proModal').classList.add('show');
+}
+
+function closeProModal() {
+  document.getElementById('proModal').classList.remove('show');
+}
+
+function subscribePro() {
+  // Open your payment / landing page
+  const url = 'https://diamondcoach.app/subscribe';
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+    window.Capacitor.Plugins.Browser.open({ url });
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+async function activateProKey() {
+  const raw     = document.getElementById('proKeyInput').value.trim().toUpperCase();
+  const resultEl = document.getElementById('proKeyResult');
+  const btn     = document.querySelector('.pro-activate-btn');
+  resultEl.style.display = 'block';
+
+  // 1. Format check first (fast, no network)
+  if (!/^DC-PRO-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(raw)) {
+    resultEl.className   = 'pro-key-result err';
+    resultEl.textContent = '❌ Invalid format — keys look like DC-PRO-XXXX-XXXX. Check your confirmation email.';
+    return;
+  }
+
+  // 2. Validate against backend
+  btn.disabled    = true;
+  btn.textContent = 'Validating…';
+  resultEl.className   = 'pro-key-result';
+  resultEl.textContent = '⏳ Checking with server…';
+
+  try {
+    const res = await httpPost(
+      `${BACKEND_URL}/validate-key`,
+      { 'Content-Type': 'application/json' },
+      { key: raw, deviceId: getDeviceId() }
+    );
+
+    if (!res.valid) {
+      resultEl.className   = 'pro-key-result err';
+      resultEl.textContent = '❌ ' + (res.reason || 'Key validation failed.');
+      btn.disabled = false; btn.textContent = 'Activate';
+      return;
+    }
+  } catch (networkErr) {
+    // Backend unreachable — allow offline activation (re-verified next launch)
+    console.warn('Backend offline, allowing cached activation:', networkErr.message);
+  }
+
+  // 3. Activate locally
+  isPro   = true;
+  proKey  = raw;
+  localStorage.setItem('dc_is_pro',  'true');
+  localStorage.setItem('dc_pro_key', raw);
+
+  // Automatically set DiamondCoach as provider
+  currentProvider = 'diamondcoach';
+  apiKey          = raw;
+  localStorage.setItem('dc_provider',         'diamondcoach');
+  localStorage.setItem('dc_api',              raw);
+  localStorage.setItem('dc_api_diamondcoach', raw);
+
+  updateProBadge();
+  updateKeyBtn();
+  renderSportStrip();
+  renderUsageMeter();
+
+  resultEl.className   = 'pro-key-result ok';
+  resultEl.textContent = '✅ Pro activated! All sports and unlimited AI unlocked.';
+  btn.disabled = false; btn.textContent = 'Activate';
+  setTimeout(() => closeProModal(), 1600);
+  showToast('⭐ Welcome to CoachAI Pro!', 'success');
+}
+
+// Called on every app launch — silently revokes Pro if subscription lapsed
+async function verifyProOnLaunch() {
+  if (!isPro || !proKey) return;
+  try {
+    const res = await httpPost(
+      `${BACKEND_URL}/validate-key`,
+      { 'Content-Type': 'application/json' },
+      { key: proKey, deviceId: getDeviceId() }
+    );
+    if (res.valid === false) {
+      // Subscription cancelled or payment failed on the server
+      isPro  = false;
+      proKey = '';
+      localStorage.removeItem('dc_is_pro');
+      localStorage.removeItem('dc_pro_key');
+      if (currentProvider === 'diamondcoach') {
+        currentProvider = 'anthropic';
+        apiKey = localStorage.getItem('dc_api_anthropic') || '';
+        localStorage.setItem('dc_provider', 'anthropic');
+        localStorage.setItem('dc_api', apiKey);
+      }
+      if (currentSport !== 'baseball') setSport('baseball');
+      updateProBadge();
+      updateKeyBtn();
+      renderSportStrip();
+      renderUsageMeter();
+      showToast('Pro subscription expired. Tap Upgrade to resubscribe.', 'error');
+    }
+  } catch (_) {
+    // Network error — don't revoke, assume still active
+  }
+}
+
+function deactivatePro() {
+  showConfirm('Deactivate Pro? You will lose access to premium features.', () => {
+    isPro  = false;
+    proKey = '';
+    localStorage.removeItem('dc_is_pro');
+    localStorage.removeItem('dc_pro_key');
+    // Revert provider if it was diamondcoach
+    if (currentProvider === 'diamondcoach') {
+      currentProvider = 'anthropic';
+      apiKey = localStorage.getItem('dc_api_anthropic') || '';
+      localStorage.setItem('dc_provider', 'anthropic');
+      localStorage.setItem('dc_api', apiKey);
+    }
+    // Revert sport to baseball if on a locked sport
+    if (currentSport !== 'baseball') setSport('baseball');
+    updateProBadge();
+    updateKeyBtn();
+    renderSportStrip();
+    renderUsageMeter();
+    closeProModal();
+    showToast('Pro deactivated', 'info');
+  });
+}
+
+function updateProBadge() {
+  const btn = document.getElementById('upgradeBtn');
+  if (!btn) return;
+  if (isPro) {
+    btn.textContent  = '⭐ Pro';
+    btn.className    = 'key-btn pro-badge';
+    btn.onclick      = () => openProModal();
+  } else {
+    btn.textContent  = '⬆️ Upgrade';
+    btn.className    = 'key-btn upgrade-btn';
+    btn.onclick      = () => openProModal();
+  }
+}
+
+// ═══════════════════════════════════════════
+// GO
+// ═══════════════════════════════════════════
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Used by xcodebuild -exportArchive and Codemagic.
+  Fill in your Team ID from https://developer.apple.com/account → Membership.
+-->
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store-connect</string>
+
+	<!-- Replace with your 10-character Apple Developer Team ID -->
+	<key>teamID</key>
+	<string>XXXXXXXXXX</string>
+
+	<key>uploadBitcode</key>
+	<false/>
+
+	<key>uploadSymbols</key>
+	<true/>
+
+	<key>compileBitcode</key>
+	<false/>
+
+	<key>signingStyle</key>
+	<string>automatic</string>
+
+	<key>destination</key>
+	<string>upload</string>
+</dict>
+</plist>

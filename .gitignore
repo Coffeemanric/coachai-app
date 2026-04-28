@@ -1,0 +1,37 @@
+# Node
+node_modules/
+npm-debug.log*
+.npm
+
+# Capacitor build outputs
+android/app/build/
+android/.gradle/
+android/local.properties
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/DerivedData/
+*.ipa
+*.xcarchive
+
+# Backend data (licenses stored on server, not in repo)
+backend/licenses.json
+backend/.env
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Dist / temp
+dist/
+tmp/
+*.log

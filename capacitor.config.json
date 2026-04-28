@@ -1,0 +1,24 @@
+{
+  "appId": "com.diamondcoach.app",
+  "appName": "CoachAI",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": ["api.anthropic.com", "api.diamondcoach.app"]
+  },
+  "android": {
+    "backgroundColor": "#0a0c10",
+    "allowMixedContent": false
+  },
+  "ios": {
+    "backgroundColor": "#0a0c10",
+    "contentInset": "always",
+    "limitsNavigationsToAppBoundDomains": true,
+    "scrollEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}

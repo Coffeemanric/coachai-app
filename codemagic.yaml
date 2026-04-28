@@ -1,0 +1,149 @@
+# Codemagic CI/CD — CoachAI iOS + Android
+# ─────────────────────────────────────────
+# Setup:
+#   1. Push this repo to GitHub
+#   2. Sign up at https://codemagic.io (free — 500 build minutes/month)
+#   3. New project → Select repo → "Other Flutter/Native" → use this file
+#   4. Add the environment variables listed under each workflow in Codemagic UI
+#
+# Triggers: every push to `main` builds both iOS and Android automatically.
+
+workflows:
+
+  # ══════════════════════════════════════════════════════════════
+  # iOS — App Store release
+  # ══════════════════════════════════════════════════════════════
+  ios-app-store:
+    name: iOS App Store
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    environment:
+      node: 20.x
+      xcode: latest
+      cocoapods: default
+      # ── Set these in Codemagic UI → Environment variables ──────
+      # APP_STORE_CONNECT_ISSUER_ID   (from App Store Connect → Keys → Issuer ID)
+      # APP_STORE_CONNECT_KEY_ID      (from App Store Connect → Keys → Key ID)
+      # APP_STORE_CONNECT_PRIVATE_KEY (the .p8 file contents — mark as secret)
+      # CERTIFICATE_PRIVATE_KEY       (your iOS distribution certificate private key)
+      # vars:
+      #   BUNDLE_ID: com.diamondcoach.app
+      groups:
+        - app_store_credentials   # create this group in Codemagic UI
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Sync Capacitor iOS
+        script: npx cap sync ios
+
+      - name: Set version from package.json
+        script: |
+          VERSION=$(node -p "require('./package.json').version")
+          BUILD=$(( $(date +%s) - 1700000000 ))  # unique build number from timestamp
+          echo "Setting version $VERSION build $BUILD"
+          agvtool new-marketing-version "$VERSION"
+          agvtool new-version -all "$BUILD"
+        working_directory: ios/App
+
+      - name: Set up keychain and code signing
+        script: keychain initialize
+
+      - name: Fetch signing certificate & provisioning profile
+        script: |
+          app-store-connect fetch-signing-files \
+            com.diamondcoach.app \
+            --type IOS_APP_STORE \
+            --create
+        # This uses the APP_STORE_CONNECT_* env vars above
+
+      - name: Set up signing in Xcode project
+        script: xcode-project use-profiles
+
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App \
+            --export-options ios/ExportOptions.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true        # auto-push to TestFlight
+        # submit_to_app_store: true       # uncomment when ready for full release
+      email:
+        recipients:
+          - you@diamondcoach.app          # build result notification
+        notify:
+          success: true
+          failure: true
+
+  # ══════════════════════════════════════════════════════════════
+  # Android — Play Store / direct APK
+  # ══════════════════════════════════════════════════════════════
+  android-release:
+    name: Android Release
+    max_build_duration: 30
+    instance_type: linux_x2
+
+    environment:
+      node: 20.x
+      java: 21
+      android_signing:
+        - android_keystore          # create this in Codemagic UI → Code signing
+      groups:
+        - google_play               # optional — for Play Store upload
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Sync Capacitor Android
+        script: npx cap sync android
+
+      - name: Build release APK + AAB
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease
+        environment:
+          JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
+
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+
+    publishing:
+      # Uncomment to publish to Google Play (requires google_play group with service account JSON)
+      # google_play:
+      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      #   track: internal
+      email:
+        recipients:
+          - you@diamondcoach.app
+        notify:
+          success: true
+          failure: true
