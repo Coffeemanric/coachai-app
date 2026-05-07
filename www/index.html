@@ -1422,6 +1422,18 @@ html, body {
   </div>
 </div>
 
+<!-- PLAYER REPORT OVERLAY -->
+<div id="reportOverlay" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px))">
+    <button onclick="closePlayerReport()" style="display:flex;align-items:center;gap:3px;background:none;border:none;color:var(--gold);font-size:15px;font-weight:700;cursor:pointer;padding:6px 10px 6px 4px;border-radius:10px">
+      <span style="font-size:20px;line-height:1">‹</span> Players
+    </button>
+    <span style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;color:var(--text)">Player <span style="color:var(--gold)">Report</span></span>
+    <button onclick="downloadReportHTML()" style="background:var(--gold-dim);border:1.5px solid rgba(245,166,35,0.4);border-radius:10px;padding:7px 13px;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer">⬇️ Save</button>
+  </div>
+  <div id="reportContent" style="padding:16px;max-width:720px;margin:0 auto"></div>
+</div>
+
 <!-- APP SHELL -->
 <div id="app">
 
@@ -3795,107 +3807,132 @@ function exportPlayerCSV(playerId) {
 }
 
 /** Generate a printable HTML report — Pro only */
+// Stores the current report HTML for the ⬇️ Save button
+let _currentReportHTML = '';
+let _currentReportName = '';
+
 function exportPlayerPDF(playerId) {
   if (!isPro) { openProModal('export'); showToast('Export requires Pro — upgrade to download', 'error'); return; }
   const p = players.find(x => x.id === playerId);
   if (!p) return;
+
   const playerAnalyses = analyses.filter(a => a.playerId === playerId).sort((a,b) => b.ts-a.ts);
   const playerDrills   = drills.filter(d => d.playerId === playerId);
   const skills         = computeSkillSummary(playerId);
   const totalReps      = playerDrills.reduce((s,d) => s+(+d.reps||0), 0);
-
-  // Strengths / weaknesses
-  const strengths  = skills.filter(s => s.score >= 2.5);
-  const weaknesses = skills.filter(s => s.score <  2.5);
-
-  // Build chart SVG
-  const radarSkills = skills.slice(0,8);
-  const chartSVG = radarSkills.length >= 3 ? drawRadarSVG(radarSkills) : drawBarSVG(skills.slice(0,12));
-
-  // Grade color helper
+  const strengths      = skills.filter(s => s.score >= 2.5);
+  const weaknesses     = skills.filter(s => s.score <  2.5);
+  const radarSkills    = skills.slice(0,8);
+  const chartSVG       = radarSkills.length >= 3 ? drawRadarSVG(radarSkills) : drawBarSVG(skills.slice(0,12));
   const gc = g => g==='A'?'#00c853':g==='B'?'#f5a623':g==='C'?'#ff9800':'#e53935';
 
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <title>${p.name} — CoachAI Report</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0c10;color:#e8eaf2;padding:24px;max-width:760px;margin:0 auto}
-    h1{font-size:26px;font-weight:900;color:#f5a623;margin-bottom:4px}
-    h2{font-size:14px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#8b93aa;margin:24px 0 10px;border-bottom:1px solid #1e2235;padding-bottom:6px}
-    .meta{font-size:14px;color:#8b93aa;margin-bottom:20px}
-    .stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
-    .stat{background:#13161e;border:1px solid #1e2235;border-radius:8px;padding:10px 16px;text-align:center}
-    .stat-val{font-size:22px;font-weight:900;color:#f5a623}
-    .stat-lbl{font-size:11px;color:#8b93aa;text-transform:uppercase;letter-spacing:0.08em}
-    .sw-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-    .tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid}
-    .str{background:rgba(0,200,83,0.12);border-color:rgba(0,200,83,0.3);color:#00c853}
-    .wkn{background:rgba(229,57,53,0.12);border-color:rgba(229,57,53,0.3);color:#e53935}
-    table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
-    th{background:#13161e;padding:8px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8b93aa;border:1px solid #1e2235}
-    td{padding:7px 10px;border:1px solid #1e2235;color:#e8eaf2}
-    tr:nth-child(even) td{background:#0e1117}
-    .grade{font-weight:800;font-size:13px}
-    .chart-wrap{background:#13161e;border:1px solid #1e2235;border-radius:12px;padding:16px;max-width:240px;margin:0 auto}
-    .footer{margin-top:32px;text-align:center;font-size:12px;color:#4a5070;border-top:1px solid #1e2235;padding-top:16px}
-    @media print{body{background:#fff;color:#000}th{background:#f5f5f5}td{border-color:#ddd}th{color:#333}.grade{color:#000}}
-  </style></head><body>
-  <h1>⚡ ${p.name}</h1>
-  <div class="meta">${p.position} · ${p.level}${p.age ? ' · Age ' + p.age : ''} · Bats ${p.bats} · Throws ${p.throws}${p.notes ? '<br><em>' + p.notes + '</em>' : ''}</div>
-  <div class="stats">
-    <div class="stat"><div class="stat-val">${playerAnalyses.length}</div><div class="stat-lbl">Sessions</div></div>
-    <div class="stat"><div class="stat-val">${playerDrills.length}</div><div class="stat-lbl">Drills</div></div>
-    <div class="stat"><div class="stat-val">${totalReps.toLocaleString()}</div><div class="stat-lbl">Total Reps</div></div>
-    <div class="stat"><div class="stat-val">${skills.length}</div><div class="stat-lbl">Skills Tracked</div></div>
-  </div>
+  // Build in-app report content (no full HTML doc needed — rendered inside overlay)
+  const reportHTML = `
+    <div style="padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:16px">
+      <div style="font-size:22px;font-weight:900;color:var(--gold);margin-bottom:4px">⚡ ${p.name}</div>
+      <div style="font-size:13px;color:var(--muted)">${p.position} · ${p.level}${p.age?' · Age '+p.age:''} · Bats ${p.bats} · Throws ${p.throws}</div>
+      ${p.notes?`<div style="font-size:13px;color:var(--muted);font-style:italic;margin-top:4px">${p.notes}</div>`:''}
+    </div>
 
-  ${skills.length ? `<h2>Skill Chart</h2><div class="chart-wrap">${chartSVG}</div>` : ''}
+    <!-- Stats -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      ${[['📊',playerAnalyses.length,'Sessions'],['🏋️',playerDrills.length,'Drills'],['🔢',totalReps.toLocaleString(),'Total Reps'],['🎯',skills.length,'Skills']].map(([ico,val,lbl])=>`
+        <div style="flex:1;min-width:70px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:18px">${ico}</div>
+          <div style="font-size:20px;font-weight:900;color:var(--gold)">${val}</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">${lbl}</div>
+        </div>`).join('')}
+    </div>
 
-  ${(strengths.length||weaknesses.length) ? `
-  <h2>Strengths &amp; Weaknesses</h2>
-  <div class="sw-row">
-    ${strengths.map(s=>`<span class="tag str">${s.label} ${s.avgGrade}</span>`).join('')}
-    ${weaknesses.map(s=>`<span class="tag wkn">${s.label} ${s.avgGrade}</span>`).join('')}
-  </div>` : ''}
+    ${skills.length ? `
+    <!-- Skill Chart -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Skill Chart</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;justify-content:center">
+      ${chartSVG}
+    </div>` : ''}
 
-  ${skills.length ? `
-  <h2>Skill Summary</h2>
-  <table><tr><th>Skill Area</th><th>Avg Grade</th><th>Sessions</th><th>Score</th></tr>
-  ${skills.map(s=>`<tr><td>${s.label}</td><td class="grade" style="color:${gc(s.avgGrade)}">${s.avgGrade}</td><td>${s.sessions}</td><td>${s.score.toFixed(1)}/4.0</td></tr>`).join('')}
-  </table>` : ''}
+    ${(strengths.length||weaknesses.length) ? `
+    <!-- Strengths & Weaknesses -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Strengths &amp; Weaknesses</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">
+      ${strengths.map(s=>`<span style="font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.3);color:#00c853">${s.label} ${s.avgGrade}</span>`).join('')}
+      ${weaknesses.map(s=>`<span style="font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.3);color:#e53935">${s.label} ${s.avgGrade}</span>`).join('')}
+    </div>` : ''}
 
-  ${playerAnalyses.length ? `
-  <h2>Analysis History (${playerAnalyses.length} sessions)</h2>
-  <table><tr><th>Date</th><th>Sport</th><th>Module</th><th>Grades</th><th>Video</th></tr>
-  ${playerAnalyses.map(a=>`<tr>
-    <td>${a.date}</td><td>${a.sportIcon} ${a.sportName}</td><td>${a.modLabel}</td>
-    <td>${a.grades.map(g=>`<span class="grade" style="color:${gc(g.grade)}">${g.grade}</span> ${g.area}`).join(', ')}</td>
-    <td>${a.hasVideo?'✓':''}</td>
-  </tr>`).join('')}
-  </table>` : ''}
+    ${skills.length ? `
+    <!-- Skill Summary Table -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Skill Summary</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px">
+      ${skills.map((s,i)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;${i?'border-top:1px solid var(--border)':''}">
+          <span style="font-size:13px;color:var(--text)">${s.label}</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:var(--muted)">${s.sessions} session${s.sessions!==1?'s':''}</span>
+            <span style="font-size:15px;font-weight:900;color:${gc(s.avgGrade)}">${s.avgGrade}</span>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
 
-  ${playerDrills.length ? `
-  <h2>Drill Log (${playerDrills.length} entries · ${totalReps.toLocaleString()} reps)</h2>
-  <table><tr><th>Drill</th><th>Type</th><th>Reps</th><th>Date</th><th>Notes</th></tr>
-  ${playerDrills.map(d=>`<tr><td>${d.name||''}</td><td>${d.type||''}</td><td>${d.reps||''}</td><td>${d.date||''}</td><td>${d.notes||''}</td></tr>`).join('')}
-  </table>` : ''}
+    ${playerAnalyses.length ? `
+    <!-- Analysis History -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Analysis History (${playerAnalyses.length})</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px">
+      ${playerAnalyses.map((a,i)=>`
+        <div style="${i?'border-top:1px solid var(--border)':''}padding:10px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">${a.sportIcon} ${a.modLabel}${a.hasVideo?' 🎬':''}</span>
+            <span style="font-size:11px;color:var(--muted)">${a.date}</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${a.grades.map(g=>`<span style="font-size:10px;font-weight:800;width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:rgba(${g.grade==='A'?'0,200,83':g.grade==='B'?'245,166,35':g.grade==='C'?'255,152,0':'229,57,53'},0.2);color:${gc(g.grade)}" title="${g.area}">${g.grade}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
 
-  <div class="footer">Generated by CoachAI Pro · ${new Date().toLocaleDateString()}</div>
-  </body></html>`;
+    ${playerDrills.length ? `
+    <!-- Drill Log -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Drill Log (${playerDrills.length} · ${totalReps.toLocaleString()} reps)</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px">
+      ${playerDrills.map((d,i)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;${i?'border-top:1px solid var(--border)':''}">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${d.name||''}</div>
+            <div style="font-size:11px;color:var(--muted)">${d.type||''}${d.date?' · '+d.date:''}</div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--gold)">${d.reps?d.reps+' reps':''}</span>
+        </div>`).join('')}
+    </div>` : ''}
 
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+    <div style="text-align:center;font-size:12px;color:var(--muted);padding:16px 0 8px;border-top:1px solid var(--border)">
+      Generated by CoachAI Pro · ${new Date().toLocaleDateString()}
+    </div>`;
+
+  // Store for the ⬇️ Save button
+  _currentReportName = p.name;
+  _currentReportHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${p.name} — CoachAI Report</title>
+    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#0a0c10;color:#e8eaf2;padding:20px;max-width:720px;margin:0 auto}</style>
+    </head><body>${reportHTML}</body></html>`;
+
+  // Show in-app overlay (no window.open — safe for Capacitor WebView)
+  document.getElementById('reportContent').innerHTML = reportHTML;
+  document.getElementById('reportOverlay').style.display = 'block';
+  document.getElementById('reportOverlay').scrollTop = 0;
+  showToast(`📋 ${p.name}'s report ready`, 'success');
+}
+
+function closePlayerReport() {
+  document.getElementById('reportOverlay').style.display = 'none';
+}
+
+function downloadReportHTML() {
+  if (!_currentReportHTML) return;
+  const blob = new Blob([_currentReportHTML], { type: 'text/html;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
-  const win  = window.open(url, '_blank');
-  if (win) {
-    win.onload = () => { win.print(); URL.revokeObjectURL(url); };
-  } else {
-    // Fallback: download as HTML file
-    const a = document.createElement('a');
-    a.href = url; a.download = `${p.name.replace(/\s+/g,'_')}_CoachAI_Report.html`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  showToast(`📋 ${p.name}'s report ready!`, 'success');
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${_currentReportName.replace(/\s+/g,'_')}_CoachAI_Report.html`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('💾 Report saved!', 'success');
 }
 
 // ═══════════════════════════════════════════
