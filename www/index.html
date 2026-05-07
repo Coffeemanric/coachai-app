@@ -183,10 +183,11 @@ html, body {
   white-space: nowrap;
   transition: all 0.2s;
 }
-.sport-chip[data-sport="baseball"].active { background: rgba(245,166,35,0.15); border-color: #f5a623; color: #f5a623; }
-.sport-chip[data-sport="hockey"].active   { background: rgba(41,121,255,0.15);  border-color: #2979ff; color: #2979ff; }
-.sport-chip[data-sport="basketball"].active { background: rgba(255,109,0,0.15); border-color: #ff6d00; color: #ff6d00; }
-.sport-chip[data-sport="football"].active { background: rgba(0,200,83,0.15);   border-color: #00c853; color: #00c853; }
+.sport-chip[data-sport="baseball"].active   { background: rgba(245,166,35,0.15);  border-color: #f5a623; color: #f5a623; }
+.sport-chip[data-sport="hockey"].active     { background: rgba(41,121,255,0.15);   border-color: #2979ff; color: #2979ff; }
+.sport-chip[data-sport="basketball"].active { background: rgba(255,109,0,0.15);   border-color: #ff6d00; color: #ff6d00; }
+.sport-chip[data-sport="football"].active   { background: rgba(0,200,83,0.15);    border-color: #00c853; color: #00c853; }
+.sport-chip[data-sport="golf"].active       { background: rgba(118,196,66,0.15);  border-color: #76c442; color: #76c442; }
 
 /* ── SCROLLABLE CONTENT ── */
 .page-content {
@@ -2049,6 +2050,132 @@ const ALL_SPORTS = {
         ]
       }
     }
+  },
+
+  // ── GOLF ──────────────────────────────────────────────────────────────────
+  golf: {
+    name:'Golf', icon:'⛳', accentColor:'#76c442',
+    drillTypes:['Full Swing','Short Game','Putting','Bunker','Course Mgmt','Fitness'],
+    playerPositions:['Amateur','Beginner','Intermediate','Advanced','Tournament Player','Junior Golfer'],
+    coachPersona:'elite PGA-certified golf instructor with expertise in swing mechanics, short game, putting, course management, and mental performance',
+    coachIntro:'What do you want to work on today? Full swing, short game, putting, bunker play, or course management — I\'m ready to help.',
+    fieldPrompt:'You are an elite PGA golf instructor. Be specific, technical, and practical. Use **bold** for key checkpoints. Keep responses under 350 words.',
+    fieldQuestion: pos => `Complete coaching breakdown for the ${pos} shot in golf: 1) Setup and address position, 2) Key swing checkpoints for this shot, 3) Most common fault and fix, 4) 2 must-do practice drills with reps, 5) Pro-level tips to execute under pressure.`,
+    fieldEmptyMsg:'Tap any shot zone on the course above to get technique tips.',
+    fieldSVG:`
+      <!-- Sky/background -->
+      <rect x="10" y="10" width="280" height="280" fill="#2d6a1a" rx="4"/>
+      <!-- Fairway -->
+      <ellipse cx="150" cy="180" rx="55" ry="110" fill="#3d8a24"/>
+      <!-- Tee box -->
+      <rect x="125" y="250" width="50" height="28" rx="4" fill="#4fa832" stroke="#a8e060" stroke-width="1.5"/>
+      <!-- Green -->
+      <ellipse cx="150" cy="75" rx="42" ry="35" fill="#5ec42a"/>
+      <!-- Fringe -->
+      <ellipse cx="150" cy="75" rx="52" ry="44" fill="none" stroke="#4fa832" stroke-width="3"/>
+      <!-- Bunkers -->
+      <ellipse cx="100" cy="90" rx="22" ry="14" fill="#d4c47a"/>
+      <ellipse cx="200" cy="95" rx="18" ry="12" fill="#d4c47a"/>
+      <!-- Flag stick -->
+      <line x1="150" y1="75" x2="150" y2="42" stroke="white" stroke-width="2"/>
+      <polygon points="150,42 165,49 150,56" fill="#e53935"/>
+      <!-- Cup -->
+      <circle cx="150" cy="75" r="4" fill="#1a3a0a"/>
+      <!-- Rough lines -->
+      <rect x="10" y="10" width="280" height="280" fill="none" stroke="#1a5c0a" stroke-width="1" rx="4"/>
+      <!-- Water hazard -->
+      <ellipse cx="210" cy="175" rx="28" ry="18" fill="#1565c0" opacity="0.7"/>
+      <text x="210" y="179" text-anchor="middle" fill="white" font-size="9" opacity="0.9" font-family="sans-serif">💧</text>
+      <!-- Cart path -->
+      <path d="M 250 280 Q 265 200 255 130 Q 248 90 240 70" stroke="#b0bec5" stroke-width="4" fill="none" opacity="0.5"/>
+      <!-- Yardage markers -->
+      <line x1="90" y1="190" x2="210" y2="190" stroke="white" stroke-width="0.8" opacity="0.3" stroke-dasharray="4,4"/>
+      <line x1="90" y1="145" x2="210" y2="145" stroke="white" stroke-width="0.8" opacity="0.3" stroke-dasharray="4,4"/>
+      <!-- Labels -->
+      <text x="148" y="268" text-anchor="middle" fill="white" font-size="8.5" font-family="sans-serif" font-weight="bold" opacity="0.9">TEE</text>`,
+    positions:[
+      {id:'drive',    label:'Driver / Tee Shot',  x:'50%', y:'84%'},
+      {id:'fairway',  label:'Fairway Wood / Hybrid', x:'50%', y:'62%'},
+      {id:'iron',     label:'Iron Approach',      x:'32%', y:'50%'},
+      {id:'approach', label:'Wedge Approach',     x:'68%', y:'40%'},
+      {id:'bunker',   label:'Bunker Shot',        x:'22%', y:'30%'},
+      {id:'chip',     label:'Chip & Pitch',       x:'72%', y:'57%'},
+      {id:'putt',     label:'Putting',            x:'50%', y:'24%'},
+    ],
+    mods:{
+      swing:{
+        label:'Full Swing', icon:'🏌️',
+        persona:'PGA-certified swing coach specializing in biomechanics and video analysis of golf swings for all skill levels',
+        focuses:[
+          {id:'setup',   icon:'📐', label:'Setup & Address'},
+          {id:'takeaway',icon:'🔙', label:'Takeaway'},
+          {id:'backswing',icon:'🔄',label:'Backswing'},
+          {id:'downswing',icon:'⚡',label:'Downswing'},
+          {id:'impact',  icon:'💥', label:'Impact Position'},
+          {id:'followthrough',icon:'🌀',label:'Follow Through'},
+        ]
+      },
+      shortgame:{
+        label:'Short Game', icon:'🎯',
+        persona:'elite short game specialist who has coached tour professionals in chipping, pitching, and specialty shots',
+        focuses:[
+          {id:'chip',    icon:'🏌️', label:'Chipping'},
+          {id:'pitch',   icon:'🎯',  label:'Pitching'},
+          {id:'flop',    icon:'🌀',  label:'Flop Shot'},
+          {id:'bump',    icon:'⛳',  label:'Bump & Run'},
+          {id:'lob',     icon:'🚀',  label:'Lob Wedge'},
+          {id:'greenside',icon:'🔄', label:'Greenside Rough'},
+        ]
+      },
+      putting:{
+        label:'Putting', icon:'🕳️',
+        persona:'elite putting coach and green-reading specialist who has helped tour players win major championships',
+        focuses:[
+          {id:'grip',    icon:'✋',  label:'Grip & Setup'},
+          {id:'stroke',  icon:'🔄',  label:'Stroke Path'},
+          {id:'tempo',   icon:'🎵',  label:'Tempo & Rhythm'},
+          {id:'read',    icon:'👁️', label:'Green Reading'},
+          {id:'speed',   icon:'⚡',  label:'Distance Control'},
+          {id:'shortputt',icon:'🕳️',label:'Short Putts'},
+        ]
+      },
+      bunker:{
+        label:'Bunker Play', icon:'🏖️',
+        persona:'elite sand play and specialty shot coach with expertise in all bunker conditions and lies',
+        focuses:[
+          {id:'greenside_bunker',icon:'⛳',label:'Greenside Bunker'},
+          {id:'fairwaybunker',   icon:'🏌️',label:'Fairway Bunker'},
+          {id:'plugged',         icon:'💥',label:'Plugged Lie'},
+          {id:'wetbunker',       icon:'💧',label:'Wet Sand'},
+          {id:'uphill',          icon:'⬆️',label:'Uphill Lie'},
+          {id:'downhillbunker',  icon:'⬇️',label:'Downhill Lie'},
+        ]
+      },
+      course:{
+        label:'Course Mgmt', icon:'🗺️',
+        persona:'elite touring professional and caddie with expertise in course strategy, shot selection, and competitive golf management',
+        focuses:[
+          {id:'teeshot',  icon:'🎯', label:'Tee Shot Strategy'},
+          {id:'layup',    icon:'🤔', label:'Layup vs. Attack'},
+          {id:'wind',     icon:'💨', label:'Wind Play'},
+          {id:'scoring',  icon:'📊', label:'Scoring Zones'},
+          {id:'pressure', icon:'🧠', label:'Pressure Management'},
+          {id:'nineteenth',icon:'📋',label:'Pre-round Planning'},
+        ]
+      },
+      golffit:{
+        label:'Golf Fitness', icon:'💪',
+        persona:'TPI-certified golf fitness specialist who trains tour professionals in mobility, strength, and swing-specific conditioning',
+        focuses:[
+          {id:'rotation', icon:'🔄', label:'Hip Rotation'},
+          {id:'stability',icon:'⚖️', label:'Core Stability'},
+          {id:'mobility', icon:'🧘', label:'Mobility & Flexibility'},
+          {id:'speed',    icon:'⚡', label:'Swing Speed'},
+          {id:'balance',  icon:'🎯', label:'Balance & Posture'},
+          {id:'warmup',   icon:'🔥', label:'Pre-round Warm-up'},
+        ]
+      }
+    }
   }
 };
 
@@ -2204,15 +2331,15 @@ function getAnim(concept) {
   const c = concept.toLowerCase();
   if (c.includes('tee') || c.includes('contact')) return ANIM_MAP.tee;
   if (c.includes('hip') || c.includes('rotat')) return ANIM_MAP.hip;
-  if (c.includes('load') || c.includes('coil') || c.includes('stride')) return ANIM_MAP.load;
+  if (c.includes('load') || c.includes('coil') || c.includes('stride') || c.includes('backswing') || c.includes('takeaway')) return ANIM_MAP.load;
   if (c.includes('receiv') || c.includes('glove') || c.includes('soft hand')) return ANIM_MAP.glove;
-  if (c.includes('block') || c.includes('squat') || c.includes('stance')) return ANIM_MAP.squat;
-  if (c.includes('throw') || c.includes('arm action') || c.includes('release') || c.includes('velocity')) return ANIM_MAP.throw;
-  if (c.includes('sprint') || c.includes('speed') || c.includes('first step')) return ANIM_MAP.sprint;
+  if (c.includes('block') || c.includes('squat') || c.includes('stance') || c.includes('setup') || c.includes('address') || c.includes('posture')) return ANIM_MAP.squat;
+  if (c.includes('throw') || c.includes('arm action') || c.includes('release') || c.includes('velocity') || c.includes('downswing') || c.includes('impact') || c.includes('follow')) return ANIM_MAP.throw;
+  if (c.includes('sprint') || c.includes('speed') || c.includes('first step') || c.includes('swing speed')) return ANIM_MAP.sprint;
   if (c.includes('slide') || c.includes('sliding')) return ANIM_MAP.slide;
   if (c.includes('backhand')) return ANIM_MAP.backhand;
-  if (c.includes('transfer') || c.includes('quick hands')) return ANIM_MAP.transfer;
-  if (c.includes('fram')) return ANIM_MAP.frame;
+  if (c.includes('transfer') || c.includes('quick hands') || c.includes('chip') || c.includes('pitch') || c.includes('putt')) return ANIM_MAP.transfer;
+  if (c.includes('fram') || c.includes('green read') || c.includes('tempo') || c.includes('rhythm')) return ANIM_MAP.frame;
   return ANIM_MAP.default;
 }
 
@@ -2818,6 +2945,12 @@ const QUICK_QS_MAP = {
     drills:  ['QB throwing drills','Route tree workout','O-Line footwork drills','Pursuit angle drills'],
     coach:   ['Fix my mechanics','Build practice plan','Mental tips for big games','Pre-game routine'],
     field:   ['Position assignments','Coverage schemes','Blocking schemes','Red zone tips'],
+  },
+  golf: {
+    analyze: ['Fix my slice','Fix my hook','Better impact position','Improve my tempo','Stop over-the-top swing'],
+    drills:  ['Driver accuracy drill','50-yard wedge routine','Lag putting drill','Bunker escape plan'],
+    coach:   ['Fix my swing flaw','Build a practice plan','Mental tips for competition','Pre-round warm-up routine'],
+    field:   ['Driver setup tips','Iron approach tips','Bunker technique','Putting green read'],
   },
 };
 
