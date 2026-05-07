@@ -3,90 +3,448 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CoachAI Pro — Subscribe</title>
+<title>CoachAI Pro — AI Sports Coaching</title>
+<script src="https://web.squarecdn.com/v1/square.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0c10;color:#eceef5;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-  .card{background:#111318;border:1px solid #242a38;border-radius:20px;padding:36px 32px;max-width:420px;width:100%}
-  h1{font-size:28px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px}
-  h1 span{color:#f5a623}
-  .sub{font-size:14px;color:#8b93aa;margin-bottom:28px}
-  .price{font-size:42px;font-weight:800;color:#f5a623;line-height:1}
-  .price small{font-size:16px;font-weight:500;color:#8b93aa}
-  .features{list-style:none;margin:20px 0 28px}
-  .features li{padding:8px 0;font-size:14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1e2330}
-  .features li:last-child{border-bottom:none}
-  .features li::before{content:'✅';font-size:16px}
-  input{width:100%;padding:13px 16px;background:#181c24;border:1px solid #2e3650;border-radius:10px;color:#eceef5;font-size:15px;margin-bottom:12px;outline:none}
-  input:focus{border-color:#f5a623}
-  input::placeholder{color:#4a5168}
-  button{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,#f5a623,#d4700a);color:#0a0c10;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:0.02em;transition:opacity .2s}
-  button:hover{opacity:.9}
-  button:disabled{opacity:.5;cursor:not-allowed}
-  .note{font-size:11px;color:#4a5168;text-align:center;margin-top:14px;line-height:1.5}
-  .error{color:#e53935;font-size:13px;margin-bottom:10px;display:none}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0c10; --bg2: #0e1117; --card: #13161e;
+    --border: #1e2235; --gold: #f5a623; --gold2: #d4700a;
+    --text: #e8eaf2; --muted: #8b93aa; --green: #00c853;
+    --red: #e53935; --radius: 14px;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+
+  /* ── HEADER ── */
+  header { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .hdr-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; color: var(--gold); text-decoration: none; letter-spacing: 0.04em; }
+  .logo-icon { width: 34px; height: 34px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 14px; margin-left: 24px; transition: color 0.2s; }
+  nav a:hover { color: var(--text); }
+  .hdr-cta { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a0c10 !important; font-weight: 700; padding: 8px 18px; border-radius: 8px; }
+
+  /* ── HERO ── */
+  .hero { max-width: 1100px; margin: 0 auto; padding: 80px 24px 60px; text-align: center; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 5px 14px; font-size: 13px; color: var(--gold); font-weight: 600; margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(36px, 5vw, 64px); font-weight: 900; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 22px; }
+  .hero h1 span { background: linear-gradient(135deg, #f5a623, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 560px; margin: 0 auto 36px; }
+  .hero-sports { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 48px; }
+  .sport-pill { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 6px 16px; font-size: 14px; font-weight: 600; }
+
+  /* ── FEATURES ── */
+  .section { max-width: 1100px; margin: 0 auto; padding: 64px 24px; }
+  .section-title { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+  .section-sub { text-align: center; color: var(--muted); font-size: 16px; margin-bottom: 48px; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .feat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: border-color 0.2s, transform 0.2s; }
+  .feat-card:hover { border-color: rgba(245,166,35,0.4); transform: translateY(-2px); }
+  .feat-icon { font-size: 36px; margin-bottom: 14px; }
+  .feat-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .feat-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* ── SPORTS SHOWCASE ── */
+  .sports-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .sport-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 20px; }
+  .sport-card-icon { font-size: 32px; margin-bottom: 10px; }
+  .sport-card-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .sport-card-mods { font-size: 13px; color: var(--muted); }
+
+  /* ── PRICING ── */
+  .pricing-wrap { display: flex; justify-content: center; }
+  .pricing-card { background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 40px; max-width: 440px; width: 100%; text-align: center; }
+  .price-badge { display: inline-block; background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a0c10; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 12px; border-radius: 10px; margin-bottom: 20px; }
+  .price-amount { font-size: 56px; font-weight: 900; line-height: 1; color: var(--gold); }
+  .price-period { font-size: 16px; color: var(--muted); margin-bottom: 28px; }
+  .price-features { list-style: none; text-align: left; margin-bottom: 32px; }
+  .price-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .price-features li:last-child { border-bottom: none; }
+  .check { color: var(--green); font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .price-note { font-size: 12px; color: var(--muted); margin-top: 16px; }
+
+  /* ── PAYMENT FORM ── */
+  .pay-section { max-width: 500px; margin: 0 auto; padding: 0 24px 80px; }
+  .pay-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px; }
+  .pay-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .pay-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  input[type="email"] {
+    width: 100%; background: var(--bg2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; font-size: 15px; color: var(--text);
+    outline: none; transition: border-color 0.2s;
+  }
+  input[type="email"]:focus { border-color: var(--gold); }
+  input[type="email"]::placeholder { color: var(--muted); }
+
+  /* Square card container */
+  #card-container { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; min-height: 48px; transition: border-color 0.2s; }
+  #card-container.focused { border-color: var(--gold); }
+
+  .sq-card-iframe-container { border: none !important; }
+
+  .pay-btn {
+    width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #0a0c10; font-size: 16px; font-weight: 800; letter-spacing: 0.04em;
+    border: none; border-radius: 12px; padding: 16px; cursor: pointer;
+    margin-top: 20px; transition: opacity 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .pay-btn:hover { opacity: 0.92; }
+  .pay-btn:active { transform: scale(0.98); }
+  .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .pay-btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(10,12,16,0.3); border-top-color: #0a0c10; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .pay-secure { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  #pay-error { display: none; background: rgba(229,57,53,0.1); border: 1px solid rgba(229,57,53,0.3); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #ff6b6b; margin-top: 14px; }
+  #pay-success { display: none; background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); border-radius: 8px; padding: 16px; font-size: 14px; color: #00e676; margin-top: 14px; text-align: center; }
+
+  /* ── FAQ ── */
+  .faq-list { max-width: 680px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; cursor: pointer; }
+  .faq-q { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; }
+  .faq-chevron { font-size: 18px; transition: transform 0.2s; color: var(--muted); }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  .faq-a { display: none; font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.7; }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; margin: 0 10px; }
+  footer a:hover { color: var(--text); }
+
+  /* ── DIVIDERS ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    nav { display: none; }
+    .hero h1 { font-size: 32px; }
+    .pricing-card { padding: 28px 20px; }
+    .pay-card { padding: 24px 18px; }
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>⭐ CoachAI <span>Pro</span></h1>
-  <p class="sub">Unlimited AI coaching across all 4 sports. Cancel any time.</p>
 
-  <div class="price">$9.99 <small>/ month</small></div>
+<!-- HEADER -->
+<header>
+  <div class="hdr-inner">
+    <a class="logo" href="#">
+      <svg class="logo-icon" viewBox="0 0 100 100">
+        <polygon points="50,4 94,28 94,72 50,96 6,72 6,28" fill="none" stroke="#f5a623" stroke-width="6"/>
+        <polygon points="38,26 38,74 76,50" fill="#f5a623"/>
+      </svg>
+      CoachAI
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#sports">Sports</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#pricing" class="hdr-cta">Get Pro</a>
+    </nav>
+  </div>
+</header>
 
-  <ul class="features">
-    <li>All 4 sports — Baseball, Hockey, Basketball, Football</li>
-    <li>Unlimited AI analyses</li>
-    <li>Unlimited coach chat</li>
-    <li>Unlimited player profiles</li>
-    <li>DiamondCoach AI included (no API key needed)</li>
-    <li>Priority support</li>
-  </ul>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">⚡ Powered by Claude AI</div>
+  <h1>AI Coaching for <span>Every Sport</span></h1>
+  <p>Video analysis, personalized drill plans, and expert coaching for baseball, hockey, basketball, football, and golf — in your pocket.</p>
+  <div class="hero-sports">
+    <span class="sport-pill">⚾ Baseball</span>
+    <span class="sport-pill">🏒 Hockey</span>
+    <span class="sport-pill">🏀 Basketball</span>
+    <span class="sport-pill">🏈 Football</span>
+    <span class="sport-pill">⛳ Golf</span>
+  </div>
+  <a href="#pricing" style="display:inline-block;background:linear-gradient(135deg,#f5a623,#d4700a);color:#0a0c10;font-size:17px;font-weight:800;padding:16px 40px;border-radius:14px;text-decoration:none;letter-spacing:0.04em">
+    Start for $9.99/month →
+  </a>
+  <p style="font-size:13px;color:var(--muted);margin-top:12px">Cancel anytime · No contracts · Instant activation</p>
+</section>
 
-  <p id="error" class="error"></p>
-  <input type="email" id="email" placeholder="Your email address" autocomplete="email">
-  <button id="btn" onclick="checkout()">Subscribe Now →</button>
-  <p class="note">Secure payment via Stripe · Cancel anytime in your account<br>
-  Your license key will be emailed immediately after payment.</p>
+<hr class="divider">
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-title">Everything Your Coach Has. In Your Pocket.</div>
+  <div class="section-sub">Upload a video or just ask — CoachAI gives you pro-level analysis in seconds</div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🎬</div>
+      <div class="feat-title">Video Swing Analyzer</div>
+      <div class="feat-desc">Upload any video and get frame-by-frame breakdown with letter grades and step-by-step correction drills for every flaw detected.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Progress Tracking</div>
+      <div class="feat-desc">Every session is saved. See grade deltas vs. your last analysis — know exactly what's improving and what still needs work.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💬</div>
+      <div class="feat-title">Live Coach Chat</div>
+      <div class="feat-desc">Ask your AI coach anything — mechanics, strategy, drills, mental game. Unlimited questions, instant expert answers.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📋</div>
+      <div class="feat-title">Custom Drill Plans</div>
+      <div class="feat-desc">Generate personalized practice plans with sets, reps, and step-by-step instructions — tailored to your position and skill level.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">👥</div>
+      <div class="feat-title">Multi-Player Profiles</div>
+      <div class="feat-desc">Manage unlimited player profiles. Perfect for coaches, parents, or athletes tracking multiple players across different teams.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🗺️</div>
+      <div class="feat-title">Interactive Field Diagrams</div>
+      <div class="feat-desc">Tap any position on a live field, court, ice, or golf course to instantly get position-specific coaching, responsibilities, and tips.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SPORTS -->
+<section class="section" id="sports">
+  <div class="section-title">5 Sports. Dozens of Modules.</div>
+  <div class="section-sub">Pro unlocks all sports and all analysis modules</div>
+  <div class="sports-row">
+    <div class="sport-card">
+      <div class="sport-card-icon">⚾</div>
+      <div class="sport-card-name">Baseball</div>
+      <div class="sport-card-mods">Hitting · Pitching · Catching · Fielding · Baserunning</div>
+    </div>
+    <div class="sport-card">
+      <div class="sport-card-icon">🏒</div>
+      <div class="sport-card-name">Hockey</div>
+      <div class="sport-card-mods">Skating · Shooting · Stickhandling · Goaltending · Defense</div>
+    </div>
+    <div class="sport-card">
+      <div class="sport-card-icon">🏀</div>
+      <div class="sport-card-name">Basketball</div>
+      <div class="sport-card-mods">Shooting · Ball Handling · Defense · Post Play · Passing</div>
+    </div>
+    <div class="sport-card">
+      <div class="sport-card-icon">🏈</div>
+      <div class="sport-card-name">Football</div>
+      <div class="sport-card-mods">QB · Receiving · O-Line · Defense · Running Back</div>
+    </div>
+    <div class="sport-card">
+      <div class="sport-card-icon">⛳</div>
+      <div class="sport-card-name">Golf</div>
+      <div class="sport-card-mods">Full Swing · Short Game · Putting · Bunker · Course Mgmt · Fitness</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-title">Simple Pricing</div>
+  <div class="section-sub">One plan. Everything included.</div>
+  <div class="pricing-wrap">
+    <div class="pricing-card">
+      <div class="price-badge">⭐ Pro</div>
+      <div class="price-amount">$9.99</div>
+      <div class="price-period">per month · cancel anytime</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span> All 5 sports unlocked</li>
+        <li><span class="check">✓</span> Unlimited video analyses</li>
+        <li><span class="check">✓</span> Unlimited AI coach chat</li>
+        <li><span class="check">✓</span> Unlimited player profiles</li>
+        <li><span class="check">✓</span> Full analysis history &amp; progress tracking</li>
+        <li><span class="check">✓</span> All analysis modules (30+)</li>
+        <li><span class="check">✓</span> Custom drill plan generator</li>
+        <li><span class="check">✓</span> Up to 3 devices per key</li>
+      </ul>
+      <a href="#subscribe" style="display:block;background:linear-gradient(135deg,#f5a623,#d4700a);color:#0a0c10;font-size:16px;font-weight:800;padding:15px;border-radius:12px;text-decoration:none;text-align:center">
+        Subscribe Now
+      </a>
+      <div class="price-note">License key emailed instantly after payment. Works on Android &amp; iOS.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PAYMENT FORM -->
+<div class="pay-section" id="subscribe">
+  <div style="text-align:center;padding:48px 0 32px">
+    <div style="font-size:28px;font-weight:900;margin-bottom:8px">Get CoachAI Pro</div>
+    <div style="font-size:15px;color:var(--muted)">Secure payment · License key emailed instantly</div>
+  </div>
+  <div class="pay-card">
+    <div class="pay-title">💳 Subscribe — $9.99/mo</div>
+    <div class="pay-sub">Your license key arrives by email within seconds of payment.</div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label>Card Details</label>
+      <div id="card-container"></div>
+    </div>
+
+    <button class="pay-btn" id="pay-btn" onclick="handlePayment()">
+      <span id="pay-btn-text">🔒 Subscribe — $9.99/mo</span>
+    </button>
+
+    <div class="pay-secure">
+      🔐 Secured by Square Payments &nbsp;·&nbsp; 256-bit SSL
+    </div>
+
+    <div id="pay-error"></div>
+    <div id="pay-success">
+      ✅ <strong>Payment successful!</strong><br>
+      Your license key has been sent to your email. Check your inbox (and spam folder) — it usually arrives within 30 seconds.
+    </div>
+  </div>
 </div>
 
+<hr class="divider">
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="section-title">Questions?</div>
+  <div class="section-sub" style="margin-bottom:32px">Everything you need to know</div>
+  <div class="faq-list">
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">How do I activate my Pro license in the app? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">After payment, you'll receive a license key by email (format: DC-PRO-XXXX-XXXX). Open CoachAI, tap the key icon in the top right, select the "CoachAI Pro" tab, paste your key, and tap Activate. All sports and features unlock instantly.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Can I use CoachAI on multiple devices? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">Yes — each license key works on up to 3 devices. Perfect for your phone, tablet, or sharing with a training partner.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Do I need an internet connection? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">An internet connection is required for video analysis and AI chat. Your player profiles, drill history, and analysis results are stored locally and always available offline.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">What's included in the free version? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">The free version includes baseball analysis (5 analyses/day, 10 chats/day, 2 player profiles). Pro unlocks all 5 sports, unlimited usage, and all analysis modules.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">How do I cancel? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">Cancel anytime directly from your Square payment receipt or by contacting support. Your access continues until the end of your billing period — no partial refunds needed since there are no annual contracts.</div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-q">Is my payment information secure? <span class="faq-chevron">›</span></div>
+      <div class="faq-a">Absolutely. Payments are processed by Square, a PCI DSS Level 1 certified payment provider. We never see or store your card details — Square handles all payment security.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 CoachAI · AI Sports Coaching</p>
+  <p style="margin-top:8px">
+    <a href="mailto:support@coachai.app">Support</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+  </p>
+</footer>
+
 <script>
-async function checkout() {
-  const email = document.getElementById('email').value.trim();
-  const err   = document.getElementById('error');
-  const btn   = document.getElementById('btn');
-  err.style.display = 'none';
+// ── Square Web Payments SDK ────────────────────────────────────────────────────
+const APP_ID      = 'YOUR_SQUARE_APP_ID';       // ← replace with your Square App ID
+const LOCATION_ID = 'YOUR_SQUARE_LOCATION_ID';  // ← replace with your Square Location ID
+const BACKEND     = '';  // empty = same origin (backend serves this file)
 
-  if (!email || !/\S+@\S+\.\S+/.test(email)) {
-    err.textContent = 'Please enter a valid email address.';
-    err.style.display = 'block';
-    return;
-  }
+let card = null;
+let payments = null;
 
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to payment…';
-
+async function initSquare() {
+  if (!window.Square) { console.error('Square SDK not loaded'); return; }
   try {
-    const res  = await fetch('/create-checkout', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email }),
+    payments = Square.payments(APP_ID, LOCATION_ID);
+    card = await payments.card({
+      style: {
+        '.input-container': { borderColor: '#1e2235', borderRadius: '10px' },
+        '.input-container.is-focus': { borderColor: '#f5a623' },
+        input: { color: '#e8eaf2', backgroundColor: '#0e1117', fontSize: '15px' },
+        'input::placeholder': { color: '#8b93aa' },
+        '.message-text': { color: '#8b93aa' },
+      }
     });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error(data.error || 'Unknown error');
-    }
+    await card.attach('#card-container');
   } catch (e) {
-    err.textContent = 'Payment error: ' + e.message + '. Please try again.';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Subscribe Now →';
+    console.error('Square init error:', e);
+    showError('Card form failed to load. Please refresh and try again.');
   }
 }
-// Allow Enter key
-document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') checkout(); });
+
+async function handlePayment() {
+  const email = document.getElementById('email').value.trim();
+  if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return; }
+  if (!card) { showError('Card form not loaded. Please refresh.'); return; }
+
+  const btn = document.getElementById('pay-btn');
+  const txt = document.getElementById('pay-btn-text');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner"></span>&nbsp; Processing...';
+  hideError();
+
+  try {
+    const result = await card.tokenize();
+    if (result.status !== 'OK') {
+      const errs = result.errors?.map(e => e.message).join(', ') || 'Card error';
+      showError(errs);
+      resetBtn();
+      return;
+    }
+
+    const resp = await fetch(BACKEND + '/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sourceId: result.token, email }),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      showError(data.error || 'Payment failed. Please try again.');
+      resetBtn();
+      return;
+    }
+
+    // Success!
+    document.getElementById('pay-success').style.display = 'block';
+    btn.style.display = 'none';
+    document.getElementById('email').disabled = true;
+    document.getElementById('card-container').style.opacity = '0.4';
+
+  } catch (e) {
+    showError('Network error. Please check your connection and try again.');
+    resetBtn();
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('pay-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError() { document.getElementById('pay-error').style.display = 'none'; }
+function resetBtn() {
+  const btn = document.getElementById('pay-btn');
+  document.getElementById('pay-btn-text').innerHTML = '🔒 Subscribe — $9.99/mo';
+  btn.disabled = false;
+}
+
+function toggleFaq(el) { el.classList.toggle('open'); }
+
+// Init Square on page load
+document.addEventListener('DOMContentLoaded', initSquare);
 </script>
 </body>
 </html>

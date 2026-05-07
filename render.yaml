@@ -4,7 +4,8 @@
 # 2. Connect your GitHub repo: Coffeemanric/coachai-app
 # 3. Render will auto-detect this file and pre-fill all settings
 # 4. Add your secret environment variables in the Render dashboard
-#    (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SMTP_*, ADMIN_SECRET)
+#    (SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID, SQUARE_PLAN_VARIATION_ID,
+#     SQUARE_WEBHOOK_SIGNATURE_KEY, SMTP_*, ADMIN_SECRET)
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
@@ -25,13 +26,15 @@ services:
         value: 10000          # Render assigns its own port but this is the fallback
 
       # ── Add these as SECRET env vars in the Render dashboard ──────────────
-      # STRIPE_SECRET_KEY         sk_live_...
-      # STRIPE_WEBHOOK_SECRET     whsec_...
-      # STRIPE_PRICE_ID           price_...
-      # SMTP_HOST                 smtp.gmail.com
-      # SMTP_PORT                 587
-      # SMTP_USER                 you@gmail.com
-      # SMTP_PASS                 your-app-password
-      # EMAIL_FROM                CoachAI <noreply@gmail.com>
-      # ADMIN_SECRET              some-random-string
-      # FRONTEND_URL              https://coachai-backend.onrender.com
+      # SQUARE_ACCESS_TOKEN           EAAAl...
+      # SQUARE_ENVIRONMENT            production
+      # SQUARE_LOCATION_ID            L...
+      # SQUARE_PLAN_VARIATION_ID      ...
+      # SQUARE_WEBHOOK_SIGNATURE_KEY  ...
+      # SMTP_HOST                     smtp.gmail.com
+      # SMTP_PORT                     587
+      # SMTP_USER                     you@gmail.com
+      # SMTP_PASS                     your-app-password
+      # EMAIL_FROM                    CoachAI <you@gmail.com>
+      # ADMIN_SECRET                  some-random-32-char-string
+      # FRONTEND_URL                  https://coachai-backend.onrender.com
