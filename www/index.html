@@ -3955,6 +3955,26 @@ async function activateProKey() {
     return;
   }
 
+  // 1b. Owner/admin bypass keys — activate instantly, no backend needed
+  const OWNER_KEYS = ['DC-PRO-ADMN-0001', 'DC-PRO-ADMN-0002', 'DC-PRO-ADMN-0003'];
+  if (OWNER_KEYS.includes(raw)) {
+    // Skip backend entirely — go straight to activation
+    isPro   = true;
+    proKey  = raw;
+    localStorage.setItem('dc_is_pro',  'true');
+    localStorage.setItem('dc_pro_key', raw);
+    currentProvider = 'diamondcoach';
+    apiKey          = raw;
+    localStorage.setItem('dc_provider',         'diamondcoach');
+    localStorage.setItem('dc_api',              raw);
+    localStorage.setItem('dc_api_diamondcoach', raw);
+    updateProBadge(); updateKeyBtn(); renderSportStrip(); renderUsageMeter();
+    resultEl.className   = 'pro-key-result ok';
+    resultEl.textContent = '✅ Pro unlocked! All sports and features are now active.';
+    setTimeout(closeModal, 1400);
+    return;
+  }
+
   // 2. Validate against backend
   btn.disabled    = true;
   btn.textContent = 'Validating…';
@@ -4006,6 +4026,8 @@ async function activateProKey() {
 
 // Called on every app launch — silently revokes Pro if subscription lapsed
 async function verifyProOnLaunch() {
+  const OWNER_KEYS = ['DC-PRO-ADMN-0001', 'DC-PRO-ADMN-0002', 'DC-PRO-ADMN-0003'];
+  if (OWNER_KEYS.includes(proKey)) return; // owner key — skip server verification
   if (!isPro || !proKey) return;
   try {
     const res = await httpPost(
