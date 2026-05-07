@@ -67,6 +67,27 @@ html, body {
   z-index: 20;
 }
 
+/* ── BACK BUTTON ── */
+.back-btn {
+  display: none;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 10px 6px 4px;
+  border-radius: 10px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.back-btn:active { background: rgba(245,166,35,0.1); }
+.back-btn.visible { display: flex; }
+.back-arrow { font-size: 20px; line-height: 1; }
+
 .logo-wrap { display: flex; align-items: baseline; gap: 6px; }
 .logo-text {
   font-family: 'Bebas Neue', sans-serif;
@@ -1406,7 +1427,11 @@ html, body {
 
   <!-- HEADER -->
   <div class="app-header">
-    <div class="logo-wrap">
+    <button class="back-btn" id="backBtn" onclick="goBack()">
+      <span class="back-arrow">‹</span>
+      <span id="backLabel">Back</span>
+    </button>
+    <div class="logo-wrap" id="headerLogo">
       <div class="logo-text"><span id="sportIcon">⚾</span> CoachAI</div>
       <div class="logo-badge">AI</div>
     </div>
@@ -2444,6 +2469,7 @@ function init() {
   updateCoachWelcome();
   updateProBadge();
   renderUsageMeter();
+  updateBackBtn(currentTab);
   document.getElementById('sportStrip').style.display = 'flex';
   document.getElementById('moduleStrip').style.display = 'flex';
   const savedProviderKey = localStorage.getItem('dc_api_' + currentProvider);
@@ -3115,7 +3141,45 @@ async function loadPosCoach(posId, posName) {
 // ═══════════════════════════════════════════
 // TAB SWITCHING
 // ═══════════════════════════════════════════
-function switchTab(tab) {
+// ── Tab history for back navigation ──
+const tabHistory = [];
+const TAB_LABELS = {
+  analyze: 'Home', drills: 'Drills', coach: 'Coach', field: 'Field', players: 'Players'
+};
+
+function goBack() {
+  if (tabHistory.length > 0) {
+    const prev = tabHistory.pop();
+    switchTab(prev, true); // isBack = true — don't push to history
+  } else {
+    switchTab('analyze', true);
+  }
+}
+
+function updateBackBtn(tab) {
+  const btn   = document.getElementById('backBtn');
+  const label = document.getElementById('backLabel');
+  const logo  = document.getElementById('headerLogo');
+  if (!btn) return;
+  const showBack = tab !== 'analyze';
+  btn.classList.toggle('visible', showBack);
+  // Show what tab the back button goes to
+  if (showBack && tabHistory.length > 0) {
+    label.textContent = TAB_LABELS[tabHistory[tabHistory.length - 1]] || 'Back';
+  } else {
+    label.textContent = 'Home';
+  }
+  // Shrink logo on non-home screens so back btn + logo + right buttons fit
+  if (logo) logo.style.display = showBack ? 'none' : 'flex';
+}
+
+function switchTab(tab, isBack = false) {
+  // Push current tab to history before switching (not when going back, not same tab)
+  if (!isBack && tab !== currentTab) {
+    tabHistory.push(currentTab);
+    if (tabHistory.length > 15) tabHistory.shift(); // cap history
+  }
+
   currentTab = tab;
 
   // Nav buttons
@@ -3140,6 +3204,7 @@ function switchTab(tab) {
   if (tab === 'players') renderPlayersPage();
 
   renderQuickQs();
+  updateBackBtn(tab);
 
   // Scroll top
   document.getElementById('pageContent').scrollTop = 0;
