@@ -356,6 +356,94 @@ app.post('/admin/resend-key', async (req, res) => {
   res.json({ ok: true, sentTo: rec.email });
 });
 
+// ─── Sync Storage ─────────────────────────────────────────────────────────────
+// Stores player/analysis/drill data per Pro key
+// File: sync_data/{keyHash}.json
+// Format: { players:[], analyses:[], drills:[], updatedAt }
+const SYNC_DIR = path.join(__dirname, 'sync_data');
+if (!fs.existsSync(SYNC_DIR)) fs.mkdirSync(SYNC_DIR, { recursive: true });
+
+function syncPath(key) {
+  const hash = crypto.createHash('sha256').update(key).digest('hex').slice(0, 32);
+  return path.join(SYNC_DIR, `${hash}.json`);
+}
+function loadSync(key) {
+  try { return JSON.parse(fs.readFileSync(syncPath(key), 'utf8')); }
+  catch { return { players: [], analyses: [], drills: [], updatedAt: null }; }
+}
+function saveSync(key, data) {
+  data.updatedAt = new Date().toISOString();
+  fs.writeFileSync(syncPath(key), JSON.stringify(data));
+}
+
+// Merge arrays by id — latest updatedAt wins per record
+function mergeById(existing, incoming) {
+  const map = new Map();
+  for (const item of existing) map.set(item.id, item);
+  for (const item of incoming) {
+    const ex = map.get(item.id);
+    if (!ex) { map.set(item.id, item); continue; }
+    const exTime = new Date(ex.updatedAt || ex.createdAt || 0).getTime();
+    const inTime = new Date(item.updatedAt || item.createdAt || 0).getTime();
+    if (inTime >= exTime) map.set(item.id, item);
+  }
+  return Array.from(map.values());
+}
+
+// Validate the key is real and active (allows owner keys too)
+function isValidProKey(key) {
+  const OWNER_KEYS = ['DC-PRO-ADMN-0001', 'DC-PRO-ADMN-0002', 'DC-PRO-ADMN-0003'];
+  if (OWNER_KEYS.includes(key)) return true;
+  const db  = loadDB();
+  const rec = db[key];
+  return rec && (rec.status === 'active' || rec.status === 'past_due');
+}
+
+// ─── POST /sync/push ──────────────────────────────────────────────────────────
+// Body: { key, players[], analyses[], drills[] }
+app.post('/sync/push', (req, res) => {
+  const { key, players = [], analyses = [], drills = [] } = req.body;
+  if (!key) return res.status(400).json({ error: 'key required' });
+  if (!isValidProKey(key)) return res.status(403).json({ error: 'Invalid or inactive Pro key' });
+
+  const existing = loadSync(key);
+  const merged = {
+    players:  mergeById(existing.players,  players),
+    analyses: mergeById(existing.analyses, analyses),
+    drills:   mergeById(existing.drills,   drills),
+  };
+  saveSync(key, merged);
+  res.json({ ok: true, counts: { players: merged.players.length, analyses: merged.analyses.length, drills: merged.drills.length } });
+});
+
+// ─── GET /sync/pull ───────────────────────────────────────────────────────────
+// Query: ?key=DC-PRO-...
+app.get('/sync/pull', (req, res) => {
+  const key = req.query.key || req.headers['x-pro-key'];
+  if (!key) return res.status(400).json({ error: 'key required' });
+  if (!isValidProKey(key)) return res.status(403).json({ error: 'Invalid or inactive Pro key' });
+
+  const data = loadSync(key);
+  res.json({ ok: true, ...data });
+});
+
+// ─── GET /portal/data ─────────────────────────────────────────────────────────
+// Same as pull but returns HTML-portal-friendly JSON (via query param for browser)
+app.get('/portal/data', (req, res) => {
+  const key = req.query.key;
+  if (!key) return res.status(400).json({ error: 'key required' });
+  if (!isValidProKey(key)) return res.status(403).json({ error: 'Invalid or inactive Pro key' });
+
+  const data = loadSync(key);
+  const db   = loadDB();
+  const rec  = db[key];
+  res.json({
+    ok: true,
+    license: rec ? { email: rec.email, status: rec.status, createdAt: rec.createdAt } : { status: 'owner' },
+    ...data,
+  });
+});
+
 // ─── Start ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`CoachAI backend running on port ${PORT}`));
